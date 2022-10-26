@@ -1,0 +1,44 @@
+twilio:
+  account_sid: AC1cb41c165af7aa907e778ca797142167
+  auth_token: 491b5b99c7ee8a6cbf78b7668ad40599
+  service_id: VA744925cb58a819cc9ff07587bbff3143
+#
+#app:
+#  jwtSecret: PH!$3$P@ss
+#  jwtExpirationInMs: 3600000
+spring:
+  datasource:
+    driverClassName: org.postgresql.Driver
+    url: jdbc:postgresql://localhost/tagalong?autoReconnect=true
+    username: lamis
+    password: lamis
+  # Str0ngAdmInP@ssw0rd  ddd_liberia
+  jpa:
+    hibernate:
+      ddl-auto: update
+      use-new-id-generator-mappings: false
+  liquibase:
+    change-log: classpath:/db/changelog/changelog-master.xml
+  mail:
+    host: smtp.gmail.com
+    port: 587
+    username: dddapp.lib@gmail.com
+    password: "dddapp1@"
+    properties:
+      mail.smtp.starttls.enable: true
+      mail.smtp.starttls.required: true
+      mail.smtp.auth: true
+      jpa:
+        database-platform: org.hibernate.dialect.MySQL5Dialect
+  jackson:
+    serialization:
+      WRITE_DATES_AS_TIMESTAMPS: false
+    time-zone: UTC
+
+cors:
+  allowedOrings: "*"
+
+
+
+
+
