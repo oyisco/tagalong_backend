@@ -43,7 +43,7 @@ public class DriverService {
     public Driver create(Driver driverDO) throws ConstraintsViolationException {
         Driver driver = new Driver();
         try {
-            driver.setVehicleSeat("3");
+            driver.setVehicleSeat(3);
             driver = driverRepository.save(driverDO);
         } catch (DataIntegrityViolationException e) {
             LOG.warn("Some constraints are thrown due to driver creation", e);
@@ -78,11 +78,12 @@ public class DriverService {
      */
 
     @Transactional
-    public void updateLocation(long driverId, double longitude, double latitude, OnlineStatus onlineStatus) throws EntityNotFoundException {
+    public void updateLocation(long driverId, double longitude, double latitude, OnlineStatus onlineStatus,int seatNumber) throws EntityNotFoundException {
         Driver driverDO = findDriverChecked(driverId);
         driverDO.setLatitudeDriverFrom(latitude);
         driverDO.setLongitudeDriverFrom(longitude);
         driverDO.setOnlineStatus(onlineStatus);
+        driverDO.setVehicleSeat(seatNumber);
     }
 
 

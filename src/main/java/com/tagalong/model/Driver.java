@@ -38,5 +38,5 @@ public class Driver extends Auditable {
     @JsonIgnore
     private double longitudeDriverTo;
     @JsonIgnore
-    private String vehicleSeat;
+    private Integer vehicleSeat;
 }

@@ -50,9 +50,9 @@ public class DriverController {
 
     @PutMapping("/{driverId}")
     public void updateLocation(
-            @Valid @PathVariable long driverId, @RequestParam double longitude, @RequestParam double latitude, OnlineStatus onlineStatus)
+            @Valid @PathVariable long driverId, @RequestParam double longitude, @RequestParam double latitude, int seatNumber, OnlineStatus onlineStatus)
             throws ConstraintsViolationException, EntityNotFoundException {
-        driverService.updateLocation(driverId, longitude, latitude, onlineStatus);
+        driverService.updateLocation(driverId, longitude, latitude, onlineStatus,seatNumber);
     }
 
 

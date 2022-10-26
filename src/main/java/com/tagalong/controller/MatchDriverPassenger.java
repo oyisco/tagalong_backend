@@ -76,18 +76,18 @@ public class MatchDriverPassenger {
         boolean matchFound = false;
 
         for (Driver trip : driverList) {
-
-            LatLng passengerOrig = new LatLng(geolocationDto.getLatitudePassengerFrom(), geolocationDto.getLongitudePassengerFrom());
-            LatLng passengerDest = new LatLng(geolocationDto.getLatitudePassengerTo(), geolocationDto.getLongitudePassengerTo());
-
-
-            LatLng driverOrigin = new LatLng(trip.getLatitudeDriverFrom(), trip.getLongitudeDriverFrom());
-            LatLng driverDest = new LatLng(trip.getLatitudeDriverTo(), trip.getLongitudeDriverTo());
+            if (trip.getVehicleSeat() < 3) {
+                LatLng passengerOrig = new LatLng(geolocationDto.getLatitudePassengerFrom(), geolocationDto.getLongitudePassengerFrom());
+                LatLng passengerDest = new LatLng(geolocationDto.getLatitudePassengerTo(), geolocationDto.getLongitudePassengerTo());
 
 
-            DirectionsResult directionsResult = DirectionsApi.newRequest(apiContext).mode(TravelMode.DRIVING).origin(driverOrigin).destination(driverDest).await();
+                LatLng driverOrigin = new LatLng(trip.getLatitudeDriverFrom(), trip.getLongitudeDriverFrom());
+                LatLng driverDest = new LatLng(trip.getLatitudeDriverTo(), trip.getLongitudeDriverTo());
 
-            System.out.println("Route" + directionsResult.routes[0].legs[0].steps[0].duration);
+
+                DirectionsResult directionsResult = DirectionsApi.newRequest(apiContext).mode(TravelMode.DRIVING).origin(driverOrigin).destination(driverDest).await();
+
+                System.out.println("Route" + directionsResult.routes[0].legs[0].steps[0].duration);
 
 
 //
@@ -106,67 +106,67 @@ public class MatchDriverPassenger {
 //
 
 
-            /**
-             * check the pickup location of package lies on the drivers route or not
-             */
-            int i = 0;
+                /**
+                 * check the pickup location of package lies on the drivers route or not
+                 */
+                int i = 0;
 
-            double distanceFromStartPoint = 0, distanceFromEndPoint;
-            for (DirectionsStep directionsStep : directionsResult.routes[0].legs[0].steps) {
+                double distanceFromStartPoint = 0, distanceFromEndPoint;
+                for (DirectionsStep directionsStep : directionsResult.routes[0].legs[0].steps) {
 
-                distanceFromStartPoint = distance(passengerOrig.lat, passengerOrig.lng, directionsStep.startLocation.lat, directionsStep.startLocation.lng, "M");
-                distanceFromEndPoint = distance(passengerOrig.lat, passengerOrig.lng, directionsStep.endLocation.lat, directionsStep.endLocation.lng, "M");
-                i++;
-                if (distanceFromStartPoint <= 5|| distanceFromEndPoint <= 5) {
+                    distanceFromStartPoint = distance(passengerOrig.lat, passengerOrig.lng, directionsStep.startLocation.lat, directionsStep.startLocation.lng, "M");
+                    distanceFromEndPoint = distance(passengerOrig.lat, passengerOrig.lng, directionsStep.endLocation.lat, directionsStep.endLocation.lng, "M");
+                    i++;
+                    if (distanceFromStartPoint <= 5 || distanceFromEndPoint <= 5) {
 
-                    matchFound = isMatchFound(passengerDest, directionsResult, i, matchFound);
+                        matchFound = isMatchFound(passengerDest, directionsResult, i, matchFound);
+
+                    }
+
+                    if (matchFound) {
+                        break;
+                    }
 
                 }
 
                 if (matchFound) {
+                    map.put("message", "matchFound");
+                    map.put("driver", trip);
+                    map.put("userDetails", passengers);
+                    map.put("duration", directionsResult.routes[0].legs[0].steps[0].duration);
+                    map.put("distance", directionsResult.routes[0].legs[0].steps[0].distance);
+                    trip.setIsAvailable(Boolean.FALSE);
+                    //trip.setStatus("Booked");
+                    this.driverRepository.save(trip);
+                    Request request = new Request();
+                    request.setDriverId(trip.getId());
+                    request.setUserId(Objects.requireNonNull(passenger).getId());
+                    request.setEmail(passenger.getEmail());
+                    request.setLatitudePassengerFrom(geolocationDto.getLatitudePassengerFrom());
+                    request.setLatitudePassengerFrom(geolocationDto.getLongitudePassengerFrom());
+                    request.setLatitudePassengerTo(geolocationDto.getLatitudePassengerTo());
+                    request.setLongitudePassengerFrom(geolocationDto.getLongitudePassengerFrom());
+                    request.setStatus("matchFound");
+                    this.requestRepository.save(request);
+
+
                     break;
                 }
+            }
+
+
+            if (!matchFound) {
+
+                map.put("message", "We ll get back to you shortly with details");
 
             }
 
-            if (matchFound) {
-                map.put("message", "matchFound");
-                map.put("driver", trip);
-                map.put("userDetails", passengers);
-                map.put("duration", directionsResult.routes[0].legs[0].steps[0].duration);
-                map.put("distance", directionsResult.routes[0].legs[0].steps[0].distance);
-                trip.setIsAvailable(Boolean.FALSE);
-                //trip.setStatus("Booked");
-                this.driverRepository.save(trip);
-                Request request = new Request();
-                request.setDriverId(trip.getId());
-                request.setUserId(Objects.requireNonNull(passenger).getId());
-                request.setEmail(passenger.getEmail());
-                request.setLatitudePassengerFrom(geolocationDto.getLatitudePassengerFrom());
-                request.setLatitudePassengerFrom(geolocationDto.getLongitudePassengerFrom());
-                request.setLatitudePassengerTo(geolocationDto.getLatitudePassengerTo());
-                request.setLongitudePassengerFrom(geolocationDto.getLongitudePassengerFrom());
-                request.setStatus("matchFound");
-                this.requestRepository.save(request);
 
+            {
+                logger.error("Exception while calling google API");
 
-                break;
             }
         }
-
-
-        if (!matchFound) {
-
-            map.put("message", "We ll get back to you shortly with details");
-
-        }
-
-
-        {
-            logger.error("Exception while calling google API");
-
-        }
-
 
         return map;
     }
