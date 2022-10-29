@@ -7,11 +7,14 @@ import com.google.maps.model.*;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 
+import java.math.BigDecimal;
+import java.text.DecimalFormat;
+
 @SpringBootApplication
 public class TagalongApiApplication {
 
     public static void main(String[] args) {
-        SpringApplication.run(TagalongApiApplication.class, args);
+           SpringApplication.run(TagalongApiApplication.class, args);
 
 //        double lat1 = 	9.1628777;
 //        double lat2 = 9.1424061;
@@ -25,20 +28,29 @@ public class TagalongApiApplication {
 
 //current location
 
-        //LatLng start = new LatLng(9.0570752, 7.471104);
-        //  LatLng end = new LatLng(9.1424061, 7.3518225);
-        // DirectionsLeg directionsSteps = queryDirections(start, end);
-        //  Distance distance = directionsSteps.distance;
-        // double distanceInMeters = directionsSteps.distance.inMeters;
-        // double distance1 = distanceInMeters/101000.0;
-        // int dt = distance;
-        //if(directionsSteps.distance=="27 mins") {
-        // for(DirectionsStep directionsStep: directionsSteps){
-        //  System.out.println("directions" + directionsSteps.duration);
-        //  System.out.println("distance" + directionsSteps.distance);
-        // }
-        //   System.out.println("distance "+ queryDirections(start, end));
-        //}
+//        LatLng start = new LatLng(50.0011249, 8.2626402);
+//        LatLng end = new LatLng(50.0003303, 8.2621764);
+//        DirectionsLeg directionsSteps = queryDirections(start, end);
+//        Long disImeters = directionsSteps.distance.inMeters;
+//
+//        float distKm = (float) (disImeters * 0.001);
+//        DecimalFormat df = new DecimalFormat("#.0");
+//        float number = Float.valueOf(df.format(distKm));
+//
+//        if (number < 3) {
+//            System.out.println("distance Covert" + disImeters);
+//            System.out.println("distance REAL " + directionsSteps.duration);
+//            //}
+//            // System.out.println("distance "+ queryDirections(start, end));
+//        }
+
+
+        ////int dt = distance;
+        //  if(directionsSteps.distance=="27 mins") {
+        //for(DirectionsStep directionsStep: directionsSteps){
+        // System.out.println("directions" + directionsSteps.duration);
+
+
     }
 
     public static DirectionsLeg queryDirections(LatLng start, LatLng end) {

@@ -2,10 +2,12 @@ package com.tagalong.model;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 
+import com.google.maps.model.Geometry;
 import com.tagalong.dto.OnlineStatus;
 import lombok.*;
 
 import javax.persistence.*;
+import java.awt.*;
 
 @Getter
 @Setter
@@ -39,4 +41,6 @@ public class Driver extends Auditable {
     private double longitudeDriverTo;
     @JsonIgnore
     private Integer vehicleSeat;
+
+//    private Point points;
 }

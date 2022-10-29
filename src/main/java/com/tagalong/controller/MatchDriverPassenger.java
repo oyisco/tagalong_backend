@@ -13,6 +13,7 @@ import com.tagalong.model.repository.RequestRepository;
 import com.tagalong.model.repository.UserRepository;
 import com.tagalong.model.user.User;
 
+import com.tagalong.utils.LocationComparism;
 import lombok.RequiredArgsConstructor;
 import org.json.JSONArray;
 import org.json.JSONObject;
@@ -21,6 +22,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.ui.ModelMap;
 import org.springframework.web.bind.annotation.*;
 
+import java.text.DecimalFormat;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Objects;
@@ -37,29 +39,8 @@ public class MatchDriverPassenger {
     private static final Logger logger = LoggerFactory.getLogger(MatchDriverPassenger.class);
 
     @PostMapping
-    public ModelMap match(@RequestBody GeolocationDto geolocationDto,@RequestHeader("Authorization") String Authorization) throws Exception {
+    public ModelMap match(@RequestBody GeolocationDto geolocationDto, @RequestHeader("Authorization") String Authorization) throws Exception {
         ModelMap map = new ModelMap();
-
-        //Authentication auth = SecurityContrextHolder.getContext().getAuthentication();
-        //String username = auth.getName(); //get logged in user name
-
-//        User user = userService.getUserDetails(username);
-//
-//
-//        List<MyPackage> packages = user.getPackages();
-//
-//
-//        packages.sort(new Comparator<MyPackage>() {
-//
-//            @Override
-//            public int compare(MyPackage arg0, MyPackage arg1) {
-//
-//                return arg1.getTimestamp().compareTo(arg0.getTimestamp());
-//            }
-//        });
-//
-//        MyPackage myPackage = packages.get(0);
-
 
         Optional<User> passengers = this.userRepository.findByEmail(geolocationDto.getEmail());
         User passenger = null;
@@ -69,9 +50,9 @@ public class MatchDriverPassenger {
 
         List<Driver> driverList = driverRepository.findByOnlineStatusAndIsAvailable(OnlineStatus.ONLINE, Boolean.FALSE);
 
-        GeoApiContext apiContext = new GeoApiContext();
-//AIzaSyBEkQSmMLZV7EmRvQNy2yw9AJmWsVFOcyIdouble
-        apiContext.setApiKey("AIzaSyBEkQSmMLZV7EmRvQNy2yw9AJmWsVFOcyI");
+//        GeoApiContext apiContext = new GeoApiContext();
+////AIzaSyBEkQSmMLZV7EmRvQNy2yw9AJmWsVFOcyIdouble
+//        apiContext.setApiKey("AIzaSyBEkQSmMLZV7EmRvQNy2yw9AJmWsVFOcyI");
 
         boolean matchFound = false;
 
@@ -85,57 +66,56 @@ public class MatchDriverPassenger {
                 LatLng driverDest = new LatLng(trip.getLatitudeDriverTo(), trip.getLongitudeDriverTo());
 
 
-                DirectionsResult directionsResult = DirectionsApi.newRequest(apiContext).mode(TravelMode.DRIVING).origin(driverOrigin).destination(driverDest).await();
+                // DirectionsResult directionsResult = DirectionsApi.newRequest(apiContext).mode(TravelMode.DRIVING).origin(driverOrigin).destination(driverDest).await();
 
-                System.out.println("Route" + directionsResult.routes[0].legs[0].steps[0].duration);
+                //System.out.println("Route" + directionsResult.routes[0].legs[0].steps[0].duration);
+                DirectionsLeg directionsStep = LocationComparism.queryDirections(passengerOrig, driverOrigin);
 
+                long distanceInMeters = directionsStep.distance.inMeters;
 
-//
-//            Arrays.stream(directionsResult.routes[0].legs).filter(directionsLeg -> {
-//               Arrays.stream(directionsLeg.steps).filter(directionsStep -> {
-//                   Long distance = directionsStep.distance.inMeters;
-//                   Long duration = directionsStep.duration.inSeconds;
-//                   System.out.println("distance "+distance);
-//                   System.out.println("duration "+duration);
-//               //  return null;
-//                   return false;
-//               });
-//                   //     System.out.println("duration" + directionsResult.routes[0].legs);
-//                return false;
-//            });
-//
+                float distanceInKm = (float) (distanceInMeters * 0.001);
+                Driver driver = null;
+                DecimalFormat df = new DecimalFormat("#.0");
+                float roundDistance = Float.parseFloat(df.format(distanceInKm));
+                if (roundDistance < 3) {
+                    driver = this.driverRepository.findStoresWithInDistance(geolocationDto.getLatitudePassengerFrom(), geolocationDto.getLongitudePassengerFrom(), roundDistance);
+                    if (driver != null) {
+                        matchFound = true;
+                    }
+                }
 
+                //  Duration duration = directionsStep.duration.;
 
                 /**
                  * check the pickup location of package lies on the drivers route or not
                  */
-                int i = 0;
-
-                double distanceFromStartPoint = 0, distanceFromEndPoint;
-                for (DirectionsStep directionsStep : directionsResult.routes[0].legs[0].steps) {
-
-                    distanceFromStartPoint = distance(passengerOrig.lat, passengerOrig.lng, directionsStep.startLocation.lat, directionsStep.startLocation.lng, "M");
-                    distanceFromEndPoint = distance(passengerOrig.lat, passengerOrig.lng, directionsStep.endLocation.lat, directionsStep.endLocation.lng, "M");
-                    i++;
-                    if (distanceFromStartPoint <= 5 || distanceFromEndPoint <= 5) {
-
-                        matchFound = isMatchFound(passengerDest, directionsResult, i, matchFound);
-
-                    }
-
-                    if (matchFound) {
-                        break;
-                    }
-
-                }
+//                int i = 0;
+//
+//                double distanceFromStartPoint = 0, distanceFromEndPoint;
+//                for (DirectionsStep directionsStep : directionsResult.routes[0].legs[0].steps) {
+//
+//                    distanceFromStartPoint = distance(passengerOrig.lat, passengerOrig.lng, directionsStep.startLocation.lat, directionsStep.startLocation.lng, "M");
+//                    distanceFromEndPoint = distance(passengerOrig.lat, passengerOrig.lng, directionsStep.endLocation.lat, directionsStep.endLocation.lng, "M");
+//                    i++;
+//                    if (distanceFromStartPoint <= 5 || distanceFromEndPoint <= 5) {
+//
+//                        matchFound = isMatchFound(passengerDest, directionsResult, i, matchFound);
+//
+//                    }
+//
+//                    if (matchFound) {
+//                        break;
+//                    }
+//
+//                }
 
                 if (matchFound) {
                     map.put("message", "matchFound");
-                    map.put("driver", trip);
+                    map.put("driver", driver);
                     map.put("userDetails", passengers);
-                    map.put("duration", directionsResult.routes[0].legs[0].steps[0].duration);
-                    map.put("distance", directionsResult.routes[0].legs[0].steps[0].distance);
-                    trip.setIsAvailable(Boolean.FALSE);
+                    map.put("duration", directionsStep.duration);
+                    map.put("distance", directionsStep.distance);
+                    trip.setIsAvailable(Boolean.TRUE);
                     //trip.setStatus("Booked");
                     this.driverRepository.save(trip);
                     Request request = new Request();

@@ -14,6 +14,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import javax.persistence.EntityNotFoundException;
+import java.awt.*;
 import java.util.List;
 
 /**
@@ -84,7 +85,10 @@ public class DriverService {
         driverDO.setLongitudeDriverFrom(longitudeFrom);
         driverDO.setLatitudeDriverTo(latitudeTo);
         driverDO.setLongitudeDriverTo(longitudeTo);
+       // Point point = driverDO.getPoints();
+        //point.set
         driverRepository.save(driverDO);
+
         // driverDO.setOnlineStatus(onlineStatus);
         //   driverDO.setVehicleSeat(seatNumber);
     }

@@ -49,7 +49,7 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
     protected void configure(HttpSecurity httpSecurity) throws Exception {
         // We don't need CSRF for this example
         httpSecurity.csrf().disable()
-                .authorizeRequests().antMatchers("/api/auth/signin","/api/auth/signup", "/api/phoneNumber/generateTOTP","/api/phoneNumber/verifyTOTP").permitAll().
+                .authorizeRequests().antMatchers("/api/store", "/api/auth/signin", "/api/auth/signup", "/api/phoneNumber/generateTOTP", "/api/phoneNumber/verifyTOTP").permitAll().
                 antMatchers("/**/actuator/**", "/**/api-docs/**", "/**/swagger-ui.html", "/**/webjars/**",
                         "/**/api/v1/", "/**/swagger-resources/**", "/**/docs/**", "/**/health/**")
                 .permitAll().
