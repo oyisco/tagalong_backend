@@ -17,20 +17,20 @@ public class RequestController {
 
     @PutMapping
     @PostMapping
-    public ResponseEntity<Request> create(@RequestBody Request request) {
+    public ResponseEntity<Request> create(@RequestBody Request request,@RequestHeader("Authorization") String Authorization) {
 
         return ResponseEntity.ok(this.requestRepository.save(request));
     }
 
     @GetMapping
-    public ResponseEntity<List<Request>> getAllRequest() {
+    public ResponseEntity<List<Request>> getAllRequest(@RequestHeader("Authorization") String Authorization) {
 
         return ResponseEntity.ok(this.requestRepository.findAll());
     }
 
 
     @GetMapping("/{id}")
-    public ResponseEntity<Request> getRequest(@PathVariable(name = "id") Long id) {
+    public ResponseEntity<Request> getRequest(@PathVariable(name = "id") Long id,@RequestHeader("Authorization") String Authorization) {
         Optional<Request> request = this.requestRepository.findById(id);
         if (request.isPresent()) {
             Request request1 = request.get();
@@ -40,13 +40,13 @@ public class RequestController {
     }
 
     @GetMapping("{email}")
-    public ResponseEntity<List<Request>> getAllRequestByUsername(@PathVariable String email) {
+    public ResponseEntity<List<Request>> getAllRequestByUsername(@PathVariable String email,@RequestHeader("Authorization") String Authorization) {
 
         return ResponseEntity.ok(this.requestRepository.findByEmail(email));
     }
 
     @GetMapping("{userId}/{driverId}")
-    public ResponseEntity<List<Request>> getAllRequestByUsername(@PathVariable Long userId, @PathVariable Long driverId) {
+    public ResponseEntity<List<Request>> getAllRequestByUsername(@PathVariable Long userId, @PathVariable Long driverId,@RequestHeader("Authorization") String Authorization) {
 
         return ResponseEntity.ok(this.requestRepository.findByUserIdAndDriverId(userId, driverId));
     }

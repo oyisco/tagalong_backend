@@ -57,7 +57,7 @@ public class SwaggerConfig {
 
     private ApiInfo metaData() {
         return new ApiInfoBuilder()
-                .title("CHARLSE API")
+                .title("Tagalong API")
                 .description("Api Documentation")
                 .version("1.0.0")
                 .build();

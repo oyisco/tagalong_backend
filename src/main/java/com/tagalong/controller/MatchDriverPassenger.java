@@ -37,7 +37,7 @@ public class MatchDriverPassenger {
     private static final Logger logger = LoggerFactory.getLogger(MatchDriverPassenger.class);
 
     @PostMapping
-    public ModelMap match(@RequestBody GeolocationDto geolocationDto) throws Exception {
+    public ModelMap match(@RequestBody GeolocationDto geolocationDto,@RequestHeader("Authorization") String Authorization) throws Exception {
         ModelMap map = new ModelMap();
 
         //Authentication auth = SecurityContrextHolder.getContext().getAuthentication();
@@ -148,8 +148,6 @@ public class MatchDriverPassenger {
                     request.setLongitudePassengerFrom(geolocationDto.getLongitudePassengerFrom());
                     request.setStatus("matchFound");
                     this.requestRepository.save(request);
-
-
                     break;
                 }
             }

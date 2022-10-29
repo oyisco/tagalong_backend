@@ -7,14 +7,11 @@ import com.google.maps.model.*;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 
-import java.io.ObjectInputFilter;
-import java.util.Arrays;
-
 @SpringBootApplication
-public class UberApiApplication {
+public class TagalongApiApplication {
 
     public static void main(String[] args) {
-        SpringApplication.run(UberApiApplication.class, args);
+        SpringApplication.run(TagalongApiApplication.class, args);
 
 //        double lat1 = 	9.1628777;
 //        double lat2 = 9.1424061;
@@ -29,16 +26,16 @@ public class UberApiApplication {
 //current location
 
         //LatLng start = new LatLng(9.0570752, 7.471104);
-      //  LatLng end = new LatLng(9.1424061, 7.3518225);
-       // DirectionsLeg directionsSteps = queryDirections(start, end);
-      //  Distance distance = directionsSteps.distance;
-       // double distanceInMeters = directionsSteps.distance.inMeters;
-       // double distance1 = distanceInMeters/101000.0;
+        //  LatLng end = new LatLng(9.1424061, 7.3518225);
+        // DirectionsLeg directionsSteps = queryDirections(start, end);
+        //  Distance distance = directionsSteps.distance;
+        // double distanceInMeters = directionsSteps.distance.inMeters;
+        // double distance1 = distanceInMeters/101000.0;
         // int dt = distance;
         //if(directionsSteps.distance=="27 mins") {
         // for(DirectionsStep directionsStep: directionsSteps){
-      //  System.out.println("directions" + directionsSteps.duration);
-      //  System.out.println("distance" + directionsSteps.distance);
+        //  System.out.println("directions" + directionsSteps.duration);
+        //  System.out.println("distance" + directionsSteps.distance);
         // }
         //   System.out.println("distance "+ queryDirections(start, end));
         //}

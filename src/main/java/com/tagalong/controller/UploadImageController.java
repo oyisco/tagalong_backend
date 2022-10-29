@@ -19,16 +19,16 @@ public class UploadImageController {
     private final PhotoRepository photoRepository;
 
     @PostMapping
-    public ResponseEntity<Photo> saveImage(@Valid @RequestBody PhotoRequestDTO photo) {
+    public ResponseEntity<Photo> saveImage(@Valid @RequestBody PhotoRequestDTO photo, @RequestHeader("Authorization") String Authorization) {
         Photo photo1 = new Photo();
         photo1.setImage(photo.getImage());
         photo1.setEmail(photo.getEmail());
-        return ResponseEntity.ok( this.photoRepository.save(photo1));
+        return ResponseEntity.ok(this.photoRepository.save(photo1));
     }
 
 
     @PutMapping
-    public ResponseEntity<PhotoRequestDTO> updateImage(@Valid @RequestBody PhotoRequestDTO photo) {
+    public ResponseEntity<PhotoRequestDTO> updateImage(@Valid @RequestBody PhotoRequestDTO photo, @RequestHeader("Authorization") String Authorization) {
         Optional<Photo> photo1 = this.photoRepository.findById(photo.getEmail());
         if (photo1.isPresent()) {
             Photo photo2 = photo1.get();
@@ -52,13 +52,13 @@ public class UploadImageController {
     }
 
     @GetMapping
-    public ResponseEntity<List<Photo>> getAllPhoto() {
+    public ResponseEntity<List<Photo>> getAllPhoto(@RequestHeader("Authorization") String Authorization) {
         return ResponseEntity.ok(this.photoRepository.findAll());
     }
 
 
     @GetMapping("/{id}")
-    public ResponseEntity<Photo> getPhoto(@PathVariable(name = "id") String email) {
+    public ResponseEntity<Photo> getPhoto(@PathVariable(name = "id") String email, @RequestHeader("Authorization") String Authorization) {
         Optional<Photo> photo1 = this.photoRepository.findById(email);
         if (photo1.isPresent()) {
             Photo photo2 = photo1.get();

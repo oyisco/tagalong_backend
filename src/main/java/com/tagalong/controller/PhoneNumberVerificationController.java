@@ -14,7 +14,7 @@ import org.springframework.web.bind.annotation.RestController;
 import java.time.LocalDateTime;
 
 @RestController
-@RequestMapping(path = "api/phoneNumber")
+@RequestMapping(path = "/api/phoneNumber")
 @Slf4j
 public class PhoneNumberVerificationController {
 

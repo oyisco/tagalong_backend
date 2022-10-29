@@ -68,22 +68,25 @@ public class DriverService {
     }
 
 
-    /**
-     * Update the location for a driver.
-     *
-     * @param driverId
-     * @param longitude
-     * @param latitude
-     * @throws EntityNotFoundException
-     */
+//    /**
+//     * Update the location for a driver.
+//     *
+//     * @param driverId
+//     * @param longitude
+//     * @param latitude
+//     * @throws EntityNotFoundException
+//     */
 
     @Transactional
-    public void updateLocation(long driverId, double longitude, double latitude, OnlineStatus onlineStatus,int seatNumber) throws EntityNotFoundException {
-        Driver driverDO = findDriverChecked(driverId);
-        driverDO.setLatitudeDriverFrom(latitude);
-        driverDO.setLongitudeDriverFrom(longitude);
-        driverDO.setOnlineStatus(onlineStatus);
-        driverDO.setVehicleSeat(seatNumber);
+    public void updateLocation(String driverEmail, double longitudeFrom, double latitudeFrom, double longitudeTo, double latitudeTo) throws EntityNotFoundException {
+        Driver driverDO = this.driverRepository.findByEmail(driverEmail).orElseThrow(() -> new EntityNotFoundException("Could not find entity with id: " + driverEmail));
+        driverDO.setLatitudeDriverFrom(latitudeFrom);
+        driverDO.setLongitudeDriverFrom(longitudeFrom);
+        driverDO.setLatitudeDriverTo(latitudeTo);
+        driverDO.setLongitudeDriverTo(longitudeTo);
+        driverRepository.save(driverDO);
+        // driverDO.setOnlineStatus(onlineStatus);
+        //   driverDO.setVehicleSeat(seatNumber);
     }
 
 

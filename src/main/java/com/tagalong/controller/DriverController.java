@@ -7,6 +7,7 @@ import com.tagalong.exception.ConstraintsViolationException;
 import com.tagalong.exception.EntityNotFoundException;
 import com.tagalong.model.Driver;
 import com.tagalong.service.DriverService;
+import io.swagger.annotations.Authorization;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -30,41 +31,37 @@ public class DriverController {
 
 
     @GetMapping("/{driverId}")
-    public ResponseEntity<Driver> getDriver(@Valid @PathVariable long driverId) throws EntityNotFoundException {
+    public ResponseEntity<Driver> getDriver(@Valid @PathVariable long driverId, @RequestHeader("Authorization") String Authorization) throws EntityNotFoundException {
         return ResponseEntity.ok(driverService.find(driverId));
     }
 
 
     @PostMapping
-    public ResponseEntity<Driver> createDriver(@Valid @RequestBody Driver driver) throws ConstraintsViolationException {
+    public ResponseEntity<Driver> createDriver(@Valid @RequestBody Driver driver, @RequestHeader("Authorization") String Authorization) throws ConstraintsViolationException {
 
         return ResponseEntity.ok(this.driverService.create(driver));
     }
 
 
     @DeleteMapping("/{driverId}")
-    public void deleteDriver(@PathVariable long driverId) throws EntityNotFoundException {
+    public void deleteDriver(@PathVariable long driverId,@RequestHeader("Authorization") String Authorization) throws EntityNotFoundException {
         driverService.delete(driverId);
     }
 
 
-    @PutMapping("/{driverId}")
+    @PutMapping("/{driverEmail}")
     public void updateLocation(
-            @Valid @PathVariable long driverId, @RequestParam double longitude, @RequestParam double latitude, int seatNumber, OnlineStatus onlineStatus)
-            throws ConstraintsViolationException, EntityNotFoundException {
-        driverService.updateLocation(driverId, longitude, latitude, onlineStatus,seatNumber);
+            @Valid @PathVariable String driverEmail, @RequestParam double longitudeFrom, @RequestParam double latitudeFrom,  @RequestParam double longitudeTo, @RequestParam double latitudeTo,@RequestHeader("Authorization") String Authorization)
+            throws Exception {
+        driverService.updateLocation(driverEmail, longitudeFrom, latitudeFrom, longitudeTo,latitudeTo);
     }
 
 
     @GetMapping
-    public ResponseEntity<List<Driver>> findDriversByStatus(@RequestParam OnlineStatus onlineStatus)
+    public ResponseEntity<List<Driver>> findDriversByStatus(@RequestParam OnlineStatus onlineStatus,@RequestHeader("Authorization") String Authorization)
             throws ConstraintsViolationException, EntityNotFoundException {
         return ResponseEntity.ok(driverService.find(onlineStatus));
     }
-
-
-
-
 
 
 }

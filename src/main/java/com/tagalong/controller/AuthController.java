@@ -3,6 +3,7 @@ package com.tagalong.controller;
 
 //import com.tagalong.config.JwtTokenUtil;
 
+import com.tagalong.config.JwtTokenUtil;
 import com.tagalong.dto.ApiResponse;
 import com.tagalong.dto.JwtResponse;
 import com.tagalong.dto.LoginRequest;
@@ -15,6 +16,7 @@ import com.tagalong.model.role.Role;
 import com.tagalong.model.role.RoleName;
 import com.tagalong.model.user.User;
 //import com.tagalong.service.JwtUserDetailsService;
+import com.tagalong.service.JwtUserDetailsService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -25,6 +27,12 @@ import org.springframework.http.ResponseEntity;
 //import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 //import org.springframework.security.core.userdetails.UserDetails;
 //import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.security.authentication.AuthenticationManager;
+import org.springframework.security.authentication.BadCredentialsException;
+import org.springframework.security.authentication.DisabledException;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
@@ -38,34 +46,34 @@ import java.util.List;
 @RequiredArgsConstructor
 public class AuthController {
     private static final String USER_ROLE_NOT_SET = "User role not set";
-    //private final AuthenticationManager authenticationManager;
+    private final AuthenticationManager authenticationManager;
     private final UserRepository userRepository;
     private final RoleRepository roleRepository;
-    //private final JwtUserDetailsService userDetailsService;
-    //private final PasswordEncoder bcryptEncoder;
-    // private final JwtTokenUtil jwtTokenUtil;
+    private final JwtUserDetailsService userDetailsService;
+    private final PasswordEncoder bcryptEncoder;
+    private final JwtTokenUtil jwtTokenUtil;
 
-//
-//    @RequestMapping(value = "/signin", method = RequestMethod.POST)
-//    public ResponseEntity<?> createAuthenticationToken(@RequestBody LoginRequest authenticationRequest) throws Exception {
-//        authenticate(authenticationRequest.getUsernameOrEmail(), authenticationRequest.getPassword());
-//        final UserDetails userDetails = userDetailsService
-//                .loadUserByUsername(authenticationRequest.getUsernameOrEmail());
-//        final String token = jwtTokenUtil.generateToken(userDetails);
-//        System.out.println("TOKEN " + token);
-//
-//        return ResponseEntity.ok(new JwtResponse("Bearer " + token, authenticationRequest.getUsernameOrEmail()));
-//    }
 
-//    private void authenticate(String username, String password) throws Exception {
-//        try {
-//            authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(username, password));
-//        } catch (DisabledException e) {
-//            throw new Exception("USER_DISABLED", e);
-//        } catch (BadCredentialsException e) {
-//            throw new Exception("INVALID_CREDENTIALS", e);
-//        }
-//    }
+    @RequestMapping(value = "/signin", method = RequestMethod.POST)
+    public ResponseEntity<?> createAuthenticationToken(@RequestBody LoginRequest authenticationRequest) throws Exception {
+        authenticate(authenticationRequest.getUsernameOrEmail(), authenticationRequest.getPassword());
+        final UserDetails userDetails = userDetailsService
+                .loadUserByUsername(authenticationRequest.getUsernameOrEmail());
+        final String token = jwtTokenUtil.generateToken(userDetails);
+        System.out.println("TOKEN " + token);
+
+        return ResponseEntity.ok(new JwtResponse("Bearer " + token, authenticationRequest.getUsernameOrEmail()));
+    }
+
+    private void authenticate(String username, String password) throws Exception {
+        try {
+            authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(username, password));
+        } catch (DisabledException e) {
+            throw new Exception("USER_DISABLED", e);
+        } catch (BadCredentialsException e) {
+            throw new Exception("INVALID_CREDENTIALS", e);
+        }
+    }
 
     @PostMapping("/signup")
     public ResponseEntity<ApiResponse> registerUser(@Valid @RequestBody SignUpRequest signUpRequest) {
