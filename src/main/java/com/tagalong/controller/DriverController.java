@@ -1,6 +1,7 @@
 package com.tagalong.controller;
 
 
+import com.tagalong.dto.DriverUpdateLocation;
 import com.tagalong.dto.OnlineStatus;
 import com.tagalong.exception.CarAlreadyInUseException;
 import com.tagalong.exception.ConstraintsViolationException;
@@ -50,10 +51,9 @@ public class DriverController {
 
 
     @PutMapping("/{driverEmail}")
-    public void updateLocation(
-            @Valid @PathVariable String driverEmail, @RequestParam double longitudeFrom, @RequestParam double latitudeFrom,  @RequestParam double longitudeTo, @RequestParam double latitudeTo,@RequestHeader("Authorization") String Authorization)
+    public void updateLocation(@RequestBody DriverUpdateLocation updateLocation, @RequestHeader("Authorization") String Authorization)
             throws Exception {
-        driverService.updateLocation(driverEmail, longitudeFrom, latitudeFrom, longitudeTo,latitudeTo);
+        driverService.updateLocation(updateLocation);
     }
 
 

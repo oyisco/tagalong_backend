@@ -1,6 +1,7 @@
 package com.tagalong.service;
 
 
+import com.tagalong.dto.DriverUpdateLocation;
 import com.tagalong.dto.OnlineStatus;
 import com.tagalong.exception.CarAlreadyInUseException;
 import com.tagalong.exception.ConstraintsViolationException;
@@ -94,18 +95,13 @@ public class DriverService {
 //     */
 
     @Transactional
-    public void updateLocation(String driverEmail, double longitudeFrom, double latitudeFrom, double longitudeTo, double latitudeTo) throws EntityNotFoundException {
-        Driver driverDO = this.driverRepository.findByEmail(driverEmail).orElseThrow(() -> new EntityNotFoundException("Could not find entity with id: " + driverEmail));
-        driverDO.setLatitudeDriverFrom(latitudeFrom);
-        driverDO.setLongitudeDriverFrom(longitudeFrom);
-        driverDO.setLatitudeDriverTo(latitudeTo);
-        driverDO.setLongitudeDriverTo(longitudeTo);
-        // Point point = driverDO.getPoints();
-        //point.set
+    public void updateLocation(DriverUpdateLocation updateLocation) throws EntityNotFoundException {
+        Driver driverDO = this.driverRepository.findByEmail(updateLocation.getDriverEmail()).orElseThrow(() -> new EntityNotFoundException("Could not find entity with id: "));
+        driverDO.setLatitudeDriverFrom(updateLocation.getLatitudeDriverFrom());
+        driverDO.setLongitudeDriverFrom(updateLocation.getLongitudeDriverFrom());
+        driverDO.setLatitudeDriverTo(updateLocation.getLatitudeDriverTo());
+        driverDO.setLongitudeDriverTo(updateLocation.getLongitudeDriverTo());
         driverRepository.save(driverDO);
-
-        // driverDO.setOnlineStatus(onlineStatus);
-        //   driverDO.setVehicleSeat(seatNumber);
     }
 
 
