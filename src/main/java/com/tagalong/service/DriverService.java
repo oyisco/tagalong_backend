@@ -6,10 +6,13 @@ import com.tagalong.exception.CarAlreadyInUseException;
 import com.tagalong.exception.ConstraintsViolationException;
 import com.tagalong.model.Driver;
 import com.tagalong.model.repository.DriverRepository;
+import com.tagalong.model.repository.UserRepository;
+import com.tagalong.model.user.User;
 import lombok.RequiredArgsConstructor;
 import org.slf4j.LoggerFactory;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.dao.InvalidDataAccessApiUsageException;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -26,6 +29,8 @@ import java.util.List;
 public class DriverService {
     private static org.slf4j.Logger LOG = LoggerFactory.getLogger(DriverService.class);
     private final DriverRepository driverRepository;
+    private final PasswordEncoder encoder;
+    private final UserRepository userRepository;
 
 
     public Driver find(Long driverId) throws EntityNotFoundException {
@@ -47,6 +52,15 @@ public class DriverService {
 
             driver.setVehicleSeat(3);
             driver = driverRepository.save(driverDO);
+
+            User user = new User();
+            user.setFirstName(driverDO.getFirstName());
+            user.setLastName(driverDO.getLastName());
+            user.setEmail(driverDO.getEmail());
+            user.setPassword(encoder.encode(driverDO.getPassword()));
+            user.setPhone(driver.getPhoneNumber());
+            user.setVerified(driver.getVerified());
+            this.userRepository.save(user);
         } catch (DataIntegrityViolationException e) {
             LOG.warn("Some constraints are thrown due to driver creation", e);
             throw new ConstraintsViolationException(e.getMessage());
@@ -86,7 +100,7 @@ public class DriverService {
         driverDO.setLongitudeDriverFrom(longitudeFrom);
         driverDO.setLatitudeDriverTo(latitudeTo);
         driverDO.setLongitudeDriverTo(longitudeTo);
-       // Point point = driverDO.getPoints();
+        // Point point = driverDO.getPoints();
         //point.set
         driverRepository.save(driverDO);
 
