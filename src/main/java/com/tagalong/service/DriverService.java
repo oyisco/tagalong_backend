@@ -51,7 +51,8 @@ public class DriverService {
         Driver driver = new Driver();
         try {
 
-            driver.setVehicleSeat(3);
+            driverDO.setVehicleSeat(3);
+            driverDO.setPassword(encoder.encode(driverDO.getPassword()));
             driver = driverRepository.save(driverDO);
 
             User user = new User();
@@ -59,8 +60,8 @@ public class DriverService {
             user.setLastName(driverDO.getLastName());
             user.setEmail(driverDO.getEmail());
             user.setPassword(encoder.encode(driverDO.getPassword()));
-            user.setPhone(driver.getPhoneNumber());
-            user.setVerified(driver.getVerified());
+            user.setPhone(driverDO.getPhoneNumber());
+            user.setVerified(driverDO.getVerified());
             this.userRepository.save(user);
         } catch (DataIntegrityViolationException e) {
             LOG.warn("Some constraints are thrown due to driver creation", e);
@@ -101,6 +102,7 @@ public class DriverService {
         driverDO.setLongitudeDriverFrom(updateLocation.getLongitudeDriverFrom());
         driverDO.setLatitudeDriverTo(updateLocation.getLatitudeDriverTo());
         driverDO.setLongitudeDriverTo(updateLocation.getLongitudeDriverTo());
+        driverDO.setOnlineStatus(OnlineStatus.ONLINE);
         driverRepository.save(driverDO);
     }
 

@@ -19,6 +19,6 @@ public interface DriverRepository extends JpaRepository<Driver, Long> {
     String HAVERSINE_FORMULA = "(6371 * acos(cos(radians(:latitudeDriverFrom)) * cos(radians(s.longitudeDriverFrom)) *" +
             " cos(radians(s.longitudeDriverFrom) - radians(:longitudeDriverFrom)) + sin(radians(:latitudeDriverFrom)) * sin(radians(s.latitudeDriverFrom))))";
     @Query("SELECT s FROM Driver s WHERE " + HAVERSINE_FORMULA + " < :distance ORDER BY " + HAVERSINE_FORMULA + " DESC")
-    Driver findStoresWithInDistance(@Param("latitudeDriverFrom") double latitude, @Param("longitudeDriverFrom") double longitude, @Param("distance") double distanceWithInKM);
+    List<Driver> findStoresWithInDistance(@Param("latitudeDriverFrom") double latitude, @Param("longitudeDriverFrom") double longitude, @Param("distance") double distanceWithInKM);
 
 }

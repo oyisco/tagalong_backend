@@ -5,6 +5,7 @@ import com.google.maps.DirectionsApi;
 import com.google.maps.GeoApiContext;
 import com.google.maps.model.*;
 import com.tagalong.dto.GeolocationDto;
+import com.tagalong.dto.MatcherDto;
 import com.tagalong.dto.OnlineStatus;
 import com.tagalong.model.Driver;
 import com.tagalong.model.Request;
@@ -22,6 +23,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.ui.ModelMap;
 import org.springframework.web.bind.annotation.*;
 
+import javax.persistence.criteria.CriteriaBuilder;
 import java.text.DecimalFormat;
 import java.util.Arrays;
 import java.util.List;
@@ -39,15 +41,15 @@ public class MatchDriverPassenger {
     private static final Logger logger = LoggerFactory.getLogger(MatchDriverPassenger.class);
 
     @PostMapping
-    public ModelMap match(@RequestBody GeolocationDto geolocationDto, @RequestHeader("Authorization") String Authorization) throws Exception {
-        ModelMap map = new ModelMap();
+    public MatcherDto match(@RequestBody GeolocationDto geolocationDto, @RequestHeader("Authorization") String Authorization) throws Exception {
+        MatcherDto map = new MatcherDto();
 
         Optional<User> passengers = this.userRepository.findByEmail(geolocationDto.getEmail());
         User passenger = null;
         if (passengers.isPresent()) {
             passenger = passengers.get();
         }
-
+        System.out.println("here 1");
         List<Driver> driverList = driverRepository.findByOnlineStatusAndIsAvailable(OnlineStatus.ONLINE, Boolean.FALSE);
 
 //        GeoApiContext apiContext = new GeoApiContext();
@@ -56,14 +58,17 @@ public class MatchDriverPassenger {
 
         boolean matchFound = false;
 
-        for (Driver trip : driverList) {
-            if (trip.getVehicleSeat() < 3) {
+        for (Driver driver : driverList) {
+
+
+            if (driver.getVehicleSeat() <= 3) {
+
                 LatLng passengerOrig = new LatLng(geolocationDto.getLatitudePassengerFrom(), geolocationDto.getLongitudePassengerFrom());
                 LatLng passengerDest = new LatLng(geolocationDto.getLatitudePassengerTo(), geolocationDto.getLongitudePassengerTo());
 
 
-                LatLng driverOrigin = new LatLng(trip.getLatitudeDriverFrom(), trip.getLongitudeDriverFrom());
-                LatLng driverDest = new LatLng(trip.getLatitudeDriverTo(), trip.getLongitudeDriverTo());
+                LatLng driverOrigin = new LatLng(driver.getLatitudeDriverFrom(), driver.getLongitudeDriverFrom());
+                LatLng driverDest = new LatLng(driver.getLatitudeDriverTo(), driver.getLongitudeDriverTo());
 
 
                 // DirectionsResult directionsResult = DirectionsApi.newRequest(apiContext).mode(TravelMode.DRIVING).origin(driverOrigin).destination(driverDest).await();
@@ -74,14 +79,35 @@ public class MatchDriverPassenger {
                 long distanceInMeters = directionsStep.distance.inMeters;
 
                 float distanceInKm = (float) (distanceInMeters * 0.001);
-                Driver driver = null;
+                //   Driver driver = null;
                 DecimalFormat df = new DecimalFormat("#.0");
                 float roundDistance = Float.parseFloat(df.format(distanceInKm));
+
                 if (roundDistance < 3) {
-                    driver = this.driverRepository.findStoresWithInDistance(geolocationDto.getLatitudePassengerFrom(), geolocationDto.getLongitudePassengerFrom(), roundDistance);
-                    if (driver != null) {
-                        matchFound = true;
-                    }
+
+                    //   List<Driver> driverList1 = this.driverRepository.findStoresWithInDistance(geolocationDto.getLatitudePassengerFrom(), geolocationDto.getLongitudePassengerFrom(), roundDistance);
+                    // System.out.println("driverList1 " + driverList1.toString());
+                    //if (driverList1.isEmpty()) {
+                    matchFound = true;
+                    map.setMessage("matchFound");
+                    map.setDriver(driver);
+                    map.setPassenger(passengers);
+                    map.setDuration(directionsStep.duration.toString());
+                    map.setDistance(directionsStep.distance.toString());
+                    // driver.setIsAvailable(Boolean.TRUE);
+                    //trip.setStatus("Booked");
+                    this.driverRepository.save(driver);
+                    Request request = new Request();
+                    request.setDriverId(driver.getId());
+                    request.setUserId(Objects.requireNonNull(passenger).getId());
+                    request.setEmail(passenger.getEmail());
+                    request.setLatitudePassengerFrom(geolocationDto.getLatitudePassengerFrom());
+                    request.setLatitudePassengerFrom(geolocationDto.getLongitudePassengerFrom());
+                    request.setLatitudePassengerTo(geolocationDto.getLatitudePassengerTo());
+                    request.setLongitudePassengerFrom(geolocationDto.getLongitudePassengerFrom());
+                    request.setStatus("matchFound");
+                    this.requestRepository.save(request);
+                    // }
                 }
 
                 //  Duration duration = directionsStep.duration.;
@@ -109,33 +135,34 @@ public class MatchDriverPassenger {
 //
 //                }
 
-                if (matchFound) {
-                    map.put("message", "matchFound");
-                    map.put("driver", driver);
-                    map.put("userDetails", passengers);
-                    map.put("duration", directionsStep.duration);
-                    map.put("distance", directionsStep.distance);
-                    trip.setIsAvailable(Boolean.TRUE);
-                    //trip.setStatus("Booked");
-                    this.driverRepository.save(trip);
-                    Request request = new Request();
-                    request.setDriverId(trip.getId());
-                    request.setUserId(Objects.requireNonNull(passenger).getId());
-                    request.setEmail(passenger.getEmail());
-                    request.setLatitudePassengerFrom(geolocationDto.getLatitudePassengerFrom());
-                    request.setLatitudePassengerFrom(geolocationDto.getLongitudePassengerFrom());
-                    request.setLatitudePassengerTo(geolocationDto.getLatitudePassengerTo());
-                    request.setLongitudePassengerFrom(geolocationDto.getLongitudePassengerFrom());
-                    request.setStatus("matchFound");
-                    this.requestRepository.save(request);
-                    break;
-                }
+//                if (matchFound) {
+//                    map.put("message", "matchFound");
+//                    map.put("driver", driver);
+//                    map.put("userDetails", passengers);
+//                    map.put("duration", directionsStep.duration);
+//                    map.put("distance", directionsStep.distance);
+//                    trip.setIsAvailable(Boolean.TRUE);
+//                    //trip.setStatus("Booked");
+//                    this.driverRepository.save(trip);
+//                    Request request = new Request();
+//                    request.setDriverId(trip.getId());
+//                    request.setUserId(Objects.requireNonNull(passenger).getId());
+//                    request.setEmail(passenger.getEmail());
+//                    request.setLatitudePassengerFrom(geolocationDto.getLatitudePassengerFrom());
+//                    request.setLatitudePassengerFrom(geolocationDto.getLongitudePassengerFrom());
+//                    request.setLatitudePassengerTo(geolocationDto.getLatitudePassengerTo());
+//                    request.setLongitudePassengerFrom(geolocationDto.getLongitudePassengerFrom());
+//                    request.setStatus("matchFound");
+//                    this.requestRepository.save(request);
+//                    break;
+//                }
             }
 
 
             if (!matchFound) {
 
-                map.put("message", "We ll get back to you shortly with details");
+                map.setMessage("we'll get back to you when we have a driver");
+
 
             }
 
