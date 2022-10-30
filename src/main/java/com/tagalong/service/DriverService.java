@@ -44,6 +44,7 @@ public class DriverService {
     public Driver create(Driver driverDO) throws ConstraintsViolationException {
         Driver driver = new Driver();
         try {
+
             driver.setVehicleSeat(3);
             driver = driverRepository.save(driverDO);
         } catch (DataIntegrityViolationException e) {

@@ -94,8 +94,8 @@ public class AuthController {
 
         String email = signUpRequest.getEmail().toLowerCase();
 
-        //String password = bcryptEncoder.encode(signUpRequest.getPassword());
-        String password = signUpRequest.getPassword();
+        String password = bcryptEncoder.encode(signUpRequest.getPassword());
+
 
         String phone = signUpRequest.getPhone().toLowerCase();
 

@@ -49,8 +49,9 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
     protected void configure(HttpSecurity httpSecurity) throws Exception {
         // We don't need CSRF for this example
         httpSecurity.csrf().disable()
-                .authorizeRequests().antMatchers("/api/store", "/api/auth/signin", "/api/auth/signup", "/api/phoneNumber/generateTOTP", "/api/phoneNumber/verifyTOTP").permitAll().
-                antMatchers("/**/actuator/**", "/**/api-docs/**", "/**/swagger-ui.html", "/**/webjars/**",
+                .authorizeRequests().antMatchers("/api/store", "/api/auth/signin",
+                "/api/drivers/create-driver", "/api/auth/signup", "/api/phoneNumber/generateTOTP", "/api/phoneNumber/verifyTOTP").permitAll().
+                antMatchers("/**/actuator/**","/api/auth/signin", "/**/api-docs/**", "/**/swagger-ui.html", "/**/webjars/**",
                         "/**/api/v1/", "/**/swagger-resources/**", "/**/docs/**", "/**/health/**")
                 .permitAll().
                 anyRequest().authenticated().and().
