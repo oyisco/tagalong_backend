@@ -10,4 +10,5 @@ public class DriverUpdateLocation {
     private double longitudeDriverFrom;
     private double longitudeDriverTo;
     private double latitudeDriverTo;
+    private int vehicleSeat;
 }

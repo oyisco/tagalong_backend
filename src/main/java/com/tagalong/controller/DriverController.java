@@ -50,7 +50,7 @@ public class DriverController {
     }
 
 
-    @PutMapping("/{driverEmail}")
+    @PutMapping
     public void updateLocation(@RequestBody DriverUpdateLocation updateLocation, @RequestHeader("Authorization") String Authorization)
             throws Exception {
         driverService.updateLocation(updateLocation);

@@ -103,6 +103,7 @@ public class DriverService {
         driverDO.setLatitudeDriverTo(updateLocation.getLatitudeDriverTo());
         driverDO.setLongitudeDriverTo(updateLocation.getLongitudeDriverTo());
         driverDO.setOnlineStatus(OnlineStatus.ONLINE);
+        driverDO.setVehicleSeat(updateLocation.getVehicleSeat());
         driverRepository.save(driverDO);
     }
 
