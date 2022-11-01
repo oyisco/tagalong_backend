@@ -134,7 +134,7 @@ public class AuthController {
     }
 
 
-    @RequestMapping(value = "/vilify-token", method = RequestMethod.POST)
+    @RequestMapping(value = "/verify-token", method = RequestMethod.POST)
     public ResponseEntity<?> vilifyToken(@RequestHeader("Authorization") String Authorization) throws Exception {
 
         return ResponseEntity.ok(Authorization);
