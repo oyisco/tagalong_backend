@@ -10,8 +10,8 @@ spring:
   datasource:
     driverClassName: org.postgresql.Driver
     url: jdbc:postgresql://localhost/tagalong?autoReconnect=true
-    username: postgres
-    password: admin
+    username: lamis
+    password: lamis
   # Str0ngAdmInP@ssw0rd  ddd_liberia
   jpa:
     hibernate:

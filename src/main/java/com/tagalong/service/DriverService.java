@@ -1,25 +1,26 @@
 package com.tagalong.service;
 
 
-import com.tagalong.dto.DriverUpdateLocation;
-import com.tagalong.dto.OnlineStatus;
-import com.tagalong.exception.CarAlreadyInUseException;
+import com.tagalong.dto.*;
 import com.tagalong.exception.ConstraintsViolationException;
 import com.tagalong.model.Driver;
+import com.tagalong.model.Request;
 import com.tagalong.model.repository.DriverRepository;
+import com.tagalong.model.repository.RequestRepository;
 import com.tagalong.model.repository.UserRepository;
 import com.tagalong.model.user.User;
 import lombok.RequiredArgsConstructor;
 import org.slf4j.LoggerFactory;
 import org.springframework.dao.DataIntegrityViolationException;
-import org.springframework.dao.InvalidDataAccessApiUsageException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import javax.persistence.EntityNotFoundException;
-import java.awt.*;
+import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 
 /**
  * Service to encapsulate the link between DAO and controller and to have business logic for some driver specific things.
@@ -32,6 +33,8 @@ public class DriverService {
     private final DriverRepository driverRepository;
     private final PasswordEncoder encoder;
     private final UserRepository userRepository;
+    private final NotificationService notificationService;
+    private final RequestRepository requestRepository;
 
 
     public Driver find(Long driverId) throws EntityNotFoundException {
@@ -103,8 +106,111 @@ public class DriverService {
         driverDO.setLatitudeDriverTo(updateLocation.getLatitudeDriverTo());
         driverDO.setLongitudeDriverTo(updateLocation.getLongitudeDriverTo());
         driverDO.setOnlineStatus(OnlineStatus.ONLINE);
+        driverDO.setDriverFCMToken(updateLocation.getDriverFCMToken());
         driverDO.setVehicleSeat(updateLocation.getVehicleSeat());
         driverRepository.save(driverDO);
+    }
+
+
+    @Transactional
+    public void acceptRequest(String driverEmail) throws EntityNotFoundException {
+        Request request = this.requestRepository.findByDriverEmailAndStatus(driverEmail, "matchFound").orElseThrow(() -> new EntityNotFoundException("Could not find entity with id: "));
+        // driverDO.setAcceptStatus("Accepted");
+        Optional<User> user = this.userRepository.findByEmail(request.getUserEmail());
+        if (user.isPresent()) {
+            User user1 = user.get();
+            user1.setAcceptStatus("ride started");
+            this.userRepository.save(user1);
+            NotificationRequestDto notificationRequestDto = new NotificationRequestDto();
+            notificationRequestDto.setFcmToken(user1.getPassengerFCMToken());
+            notificationRequestDto.setBody("your request has been accepted from " + findDriverByEmail(driverEmail).getFirstName() + " " + findDriverByEmail(driverEmail).getLastName());
+            notificationRequestDto.setTitle("accepted request");
+            this.notificationService.sendPnsToDevice(notificationRequestDto);
+        }
+        Driver driver = findDriverByEmail(driverEmail);
+        driver.setAcceptStatus("Accepted");
+        driverRepository.save(driver);
+        this.requestRepository.save(request);
+    }
+
+    @Transactional
+    public void rejectRequest(String driverEmail) throws EntityNotFoundException {
+        Request request = this.requestRepository.findByDriverEmailAndStatus(driverEmail, "matchFound").orElseThrow(() -> new EntityNotFoundException("Could not find entity with id: "));
+        // driverDO.setAcceptStatus("Accepted");
+        request.setStatus("matchRejected");
+
+        Optional<User> user = this.userRepository.findByEmail(request.getUserEmail());
+        if (user.isPresent()) {
+            User user1 = user.get();
+            user1.setAcceptStatus("ride rejected");
+            this.userRepository.save(user1);
+            NotificationRequestDto notificationRequestDto = new NotificationRequestDto();
+            notificationRequestDto.setFcmToken(user1.getPassengerFCMToken());
+            notificationRequestDto.setBody("your request has been rejected from " + findDriverByEmail(driverEmail).getFirstName() + " " + findDriverByEmail(driverEmail).getLastName());
+            notificationRequestDto.setTitle("rejected request");
+            this.notificationService.sendPnsToDevice(notificationRequestDto);
+        }
+        Driver driver = findDriverByEmail(driverEmail);
+        driver.setAcceptStatus("rejected request");
+        driverRepository.save(driver);
+        this.requestRepository.save(request);
+    }
+
+    @Transactional
+    public void startRide(StartRideDto startRideDto) throws EntityNotFoundException {
+        Request request = this.requestRepository.findByDriverEmailAndStatus(startRideDto.getDriverEmail(), "matchFound").orElseThrow(() -> new EntityNotFoundException("Could not find entity with id: "));
+        // driverDO.setAcceptStatus("Accepted");
+        request.setStatus("startRide");
+        request.setTimeOfPickUp(LocalDateTime.now());
+        request.setPickUpAddress(startRideDto.getPickUpAddress());
+        Optional<User> user = this.userRepository.findByEmail(request.getUserEmail());
+        if (user.isPresent()) {
+            User user1 = user.get();
+            user1.setAcceptStatus("ride rejected");
+            this.userRepository.save(user1);
+            NotificationRequestDto notificationRequestDto = new NotificationRequestDto();
+            notificationRequestDto.setFcmToken(user1.getPassengerFCMToken());
+            notificationRequestDto.setBody("driver has started the ride ");
+            notificationRequestDto.setTitle("Started ride");
+            this.notificationService.sendPnsToDevice(notificationRequestDto);
+        }
+        Driver driver = findDriverByEmail(startRideDto.getDriverEmail());
+        driver.setAcceptStatus("Started ride");
+        driverRepository.save(driver);
+        this.requestRepository.save(request);
+    }
+
+    @Transactional
+    public void endRide(EndDto endDto) throws EntityNotFoundException {
+        Request request = this.requestRepository.findByDriverEmailAndStatus(endDto.getDriverEmail(), "matchFound").orElseThrow(() -> new EntityNotFoundException("Could not find entity with id: "));
+        // driverDO.setAcceptStatus("Accepted");
+        request.setStatus("endRide");
+        request.setDropOffTime(LocalDateTime.now());
+        request.setDropOffAddress(endDto.getDropOffAddress());
+        request.setAmountPaid(endDto.getAmountPaid());
+        Optional<User> user = this.userRepository.findByEmail(request.getUserEmail());
+        if (user.isPresent()) {
+            User user1 = user.get();
+            user1.setAcceptStatus("ride rejected");
+            this.userRepository.save(user1);
+            NotificationRequestDto notificationRequestDto = new NotificationRequestDto();
+            notificationRequestDto.setFcmToken(user1.getPassengerFCMToken());
+            notificationRequestDto.setBody("driver has ended the ride ");
+            notificationRequestDto.setTitle("End ride");
+            this.notificationService.sendPnsToDevice(notificationRequestDto);
+        }
+        Driver driver = findDriverByEmail(endDto.getDriverEmail());
+        driver.setAcceptStatus("End ride");
+        driverRepository.save(driver);
+        this.requestRepository.save(request);
+    }
+
+    public List<Request> tripHistory(String email) throws EntityNotFoundException {
+        String email1 = email;
+        String emeil2 = email;
+        return this.requestRepository.findByDriverEmailOrUserEmail(email1, emeil2);
+
+
     }
 
 
@@ -125,5 +231,11 @@ public class DriverService {
                 .orElseThrow(() -> new EntityNotFoundException("Could not find entity with id: " + driverId));
     }
 
+
+    private Driver findDriverByEmail(String driverEmail) throws EntityNotFoundException {
+        return driverRepository
+                .findByEmail(driverEmail)
+                .orElseThrow(() -> new EntityNotFoundException("Could not find entity with id: " + driverEmail));
+    }
 
 }

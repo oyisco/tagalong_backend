@@ -22,6 +22,9 @@ public class Driver extends Auditable {
     private String lastName;
     private String email;
     private String password;
+    private String city;
+    @JsonIgnore
+    private String driverFCMToken;
     private Boolean verified = false;
     @Embedded
     private Vehicle vehicle;
@@ -41,6 +44,10 @@ public class Driver extends Auditable {
     private double longitudeDriverTo;
     @JsonIgnore
     private Integer vehicleSeat;
+    @JsonIgnore
+    private String acceptStatus;
+    @JsonIgnore
+    private String rejectStatus;
 
 //    private Point points;
 }

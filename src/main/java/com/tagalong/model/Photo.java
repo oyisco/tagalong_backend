@@ -21,7 +21,6 @@ public class Photo {
     @Column(length = 200)
     private String email;
 
-
     @NotBlank
     @Column(name = "image")
     private String image;

@@ -17,7 +17,7 @@ public class RequestController {
 
     @PutMapping
     @PostMapping
-    public ResponseEntity<Request> create(@RequestBody Request request,@RequestHeader("Authorization") String Authorization) {
+    public ResponseEntity<Request> create(@RequestBody Request request, @RequestHeader("Authorization") String Authorization) {
 
         return ResponseEntity.ok(this.requestRepository.save(request));
     }
@@ -30,25 +30,13 @@ public class RequestController {
 
 
     @GetMapping("/{id}")
-    public ResponseEntity<Request> getRequest(@PathVariable(name = "id") Long id,@RequestHeader("Authorization") String Authorization) {
+    public ResponseEntity<Request> getRequest(@PathVariable(name = "id") Long id, @RequestHeader("Authorization") String Authorization) {
         Optional<Request> request = this.requestRepository.findById(id);
         if (request.isPresent()) {
             Request request1 = request.get();
             return ResponseEntity.ok(request1);
         } else throw new RuntimeException("RECORD NOT FOUND");
 
-    }
-
-    @GetMapping("{email}")
-    public ResponseEntity<List<Request>> getAllRequestByUsername(@PathVariable String email,@RequestHeader("Authorization") String Authorization) {
-
-        return ResponseEntity.ok(this.requestRepository.findByEmail(email));
-    }
-
-    @GetMapping("{userId}/{driverId}")
-    public ResponseEntity<List<Request>> getAllRequestByUsername(@PathVariable Long userId, @PathVariable Long driverId,@RequestHeader("Authorization") String Authorization) {
-
-        return ResponseEntity.ok(this.requestRepository.findByUserIdAndDriverId(userId, driverId));
     }
 
 

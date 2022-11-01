@@ -11,4 +11,5 @@ public class DriverUpdateLocation {
     private double longitudeDriverTo;
     private double latitudeDriverTo;
     private int vehicleSeat;
+    private String driverFCMToken;
 }

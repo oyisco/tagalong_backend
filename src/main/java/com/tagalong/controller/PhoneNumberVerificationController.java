@@ -57,4 +57,6 @@ public class PhoneNumberVerificationController {
         }
         return new ResponseEntity<>("This user's verification has been completed successfully", HttpStatus.OK);
     }
+
+
 }

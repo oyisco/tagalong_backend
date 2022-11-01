@@ -15,6 +15,7 @@ public interface DriverRepository extends JpaRepository<Driver, Long> {
     List<Driver> findByOnlineStatusAndIsAvailable(OnlineStatus onlineStatus, Boolean isAvailable);
 
     List<Driver> findByOnlineStatus(OnlineStatus onlineStatus);
+     //List<Driver> findDi
 
     String HAVERSINE_FORMULA = "(6371 * acos(cos(radians(:latitudeDriverFrom)) * cos(radians(s.longitudeDriverFrom)) *" +
             " cos(radians(s.longitudeDriverFrom) - radians(:longitudeDriverFrom)) + sin(radians(:latitudeDriverFrom)) * sin(radians(s.latitudeDriverFrom))))";

@@ -1,9 +1,15 @@
 package com.tagalong;
 
+import com.google.firebase.messaging.FirebaseMessaging;
+import com.google.firebase.messaging.FirebaseMessagingException;
+import com.google.firebase.messaging.Message;
+import com.google.firebase.messaging.Notification;
 import com.google.maps.DirectionsApi;
 import com.google.maps.DirectionsApiRequest;
 import com.google.maps.GeoApiContext;
 import com.google.maps.model.*;
+import com.tagalong.dto.NotificationRequestDto;
+import com.tagalong.model.user.User;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 
@@ -14,7 +20,8 @@ import java.text.DecimalFormat;
 public class TagalongApiApplication {
                //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
     public static void main(String[] args) {
-           SpringApplication.run(TagalongApiApplication.class, args);
+
+         SpringApplication.run(TagalongApiApplication.class, args);
 
 //        double lat1 = 	9.1628777;
 //        double lat2 = 9.1424061;
@@ -52,6 +59,8 @@ public class TagalongApiApplication {
 
 
     }
+
+
 
     public static DirectionsLeg queryDirections(LatLng start, LatLng end) {
         DirectionsLeg stepsToTake = null;

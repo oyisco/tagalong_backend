@@ -6,6 +6,7 @@ import com.google.maps.GeoApiContext;
 import com.google.maps.model.*;
 import com.tagalong.dto.GeolocationDto;
 import com.tagalong.dto.MatcherDto;
+import com.tagalong.dto.NotificationRequestDto;
 import com.tagalong.dto.OnlineStatus;
 import com.tagalong.model.Driver;
 import com.tagalong.model.Request;
@@ -14,6 +15,7 @@ import com.tagalong.model.repository.RequestRepository;
 import com.tagalong.model.repository.UserRepository;
 import com.tagalong.model.user.User;
 
+import com.tagalong.service.NotificationService;
 import com.tagalong.utils.LocationComparism;
 import lombok.RequiredArgsConstructor;
 import org.json.JSONArray;
@@ -38,6 +40,7 @@ public class MatchDriverPassenger {
     private final DriverRepository driverRepository;
     private final UserRepository userRepository;
     private final RequestRepository requestRepository;
+    private final NotificationService notificationService;
     private static final Logger logger = LoggerFactory.getLogger(MatchDriverPassenger.class);
 
     @PostMapping
@@ -88,6 +91,7 @@ public class MatchDriverPassenger {
                     //   List<Driver> driverList1 = this.driverRepository.findStoresWithInDistance(geolocationDto.getLatitudePassengerFrom(), geolocationDto.getLongitudePassengerFrom(), roundDistance);
                     // System.out.println("driverList1 " + driverList1.toString());
                     //if (driverList1.isEmpty()) {
+
                     matchFound = true;
                     map.setMessage("matchFound");
                     map.setDriver(driver);
@@ -98,15 +102,26 @@ public class MatchDriverPassenger {
                     //trip.setStatus("Booked");
                     this.driverRepository.save(driver);
                     Request request = new Request();
-                    request.setDriverId(driver.getId());
-                    request.setUserId(Objects.requireNonNull(passenger).getId());
-                    request.setEmail(passenger.getEmail());
+                    request.setDriverEmail(driver.getEmail());
+                    request.setUserEmail(passenger.getEmail());
                     request.setLatitudePassengerFrom(geolocationDto.getLatitudePassengerFrom());
                     request.setLatitudePassengerFrom(geolocationDto.getLongitudePassengerFrom());
                     request.setLatitudePassengerTo(geolocationDto.getLatitudePassengerTo());
                     request.setLongitudePassengerFrom(geolocationDto.getLongitudePassengerFrom());
                     request.setStatus("matchFound");
+                    passenger.setPassengerFCMToken(geolocationDto.getPassengerFCMToken());
+                    this.userRepository.save(passenger);
                     this.requestRepository.save(request);
+                    /*
+                    Title: New ride request
+Body: You have a new request from {passenger Name}
+                     */
+                    NotificationRequestDto notificationRequestDto = new NotificationRequestDto();
+                    notificationRequestDto.setFcmToken(driver.getDriverFCMToken());
+                    notificationRequestDto.setBody("You have a new request from " + passenger.getFirstName() + " " + passenger.getLastName());
+                    notificationRequestDto.setTitle("New ride request");
+                    this.notificationService.sendPnsToDevice(notificationRequestDto);
+
                     // }
                 }
 
