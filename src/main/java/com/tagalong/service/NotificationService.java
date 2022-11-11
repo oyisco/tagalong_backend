@@ -6,7 +6,10 @@ import com.google.firebase.FirebaseOptions;
 import com.google.firebase.messaging.*;
 import com.tagalong.dto.NotificationRequestDto;
 import com.tagalong.dto.SubscriptionRequestDto;
+<<<<<<< HEAD
 import com.tagalong.model.user.User;
+=======
+>>>>>>> origin/main
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.core.io.ClassPathResource;
@@ -14,10 +17,13 @@ import org.springframework.stereotype.Service;
 
 import javax.annotation.PostConstruct;
 import java.io.IOException;
+<<<<<<< HEAD
 import java.rmi.server.UID;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.concurrent.TimeUnit;
+=======
+>>>>>>> origin/main
 
 @Slf4j
 @Service
@@ -67,7 +73,11 @@ public class NotificationService {
 
     public String sendPnsToDevice(NotificationRequestDto notificationRequestDto) {
         Message message = Message.builder()
+<<<<<<< HEAD
                 .setToken(notificationRequestDto.getFcmToken())
+=======
+                .setToken(notificationRequestDto.getDeviceId())
+>>>>>>> origin/main
                 .setNotification(new Notification(notificationRequestDto.getTitle(), notificationRequestDto.getBody()))
                 .putData("content", notificationRequestDto.getTitle())
                 .putData("body", notificationRequestDto.getBody())
@@ -82,6 +92,7 @@ public class NotificationService {
         return response;
     }
 
+<<<<<<< HEAD
     public String sendPnsToDevice2(NotificationRequestDto notificationRequestDto, User user) {
 //        Map<String , String> userMap = new HashMap<>();
 //        String userId = user.getEmail();
@@ -107,6 +118,11 @@ public class NotificationService {
     public String sendPnsToTopic(NotificationRequestDto notificationRequestDto) {
         Message message = Message.builder()
                 .setTopic(notificationRequestDto.getFcmToken())
+=======
+    public String sendPnsToTopic(NotificationRequestDto notificationRequestDto) {
+        Message message = Message.builder()
+                .setTopic(notificationRequestDto.getDeviceId())
+>>>>>>> origin/main
                 .setNotification(new Notification(notificationRequestDto.getTitle(), notificationRequestDto.getBody()))
                 .putData("content", notificationRequestDto.getTitle())
                 .putData("body", notificationRequestDto.getBody())
@@ -122,6 +138,7 @@ public class NotificationService {
         return response;
     }
 
+<<<<<<< HEAD
     //@PostConstruct
 //    public void get() {
 //        NotificationRequestDto notificationRequestDto = new NotificationRequestDto();
@@ -166,5 +183,7 @@ public class NotificationService {
 //
 //    }
 
+=======
+>>>>>>> origin/main
 
 }

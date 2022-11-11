@@ -114,13 +114,13 @@ public class AuthController {
         List<Role> roles = new ArrayList<>();
         System.out.println("chake1");
 
-        roles.add(roleRepository.findByName(RoleName.ROLE_USER)
-                .orElseThrow(() -> new AppException(USER_ROLE_NOT_SET)));
-        //roles.add(roleRepository.findByName(RoleName.ROLE_ADMIN)
-        //   .orElseThrow(() -> new AppException(USER_ROLE_NOT_SET)));
+            roles.add(roleRepository.findByName(RoleName.ROLE_USER)
+                    .orElseThrow(() -> new AppException(USER_ROLE_NOT_SET)));
+            //roles.add(roleRepository.findByName(RoleName.ROLE_ADMIN)
+                 //   .orElseThrow(() -> new AppException(USER_ROLE_NOT_SET)));
 
-        // roles.add(roleRepository.findByName(RoleName.ROLE_USER)
-        // .orElseThrow(() -> new AppException(USER_ROLE_NOT_SET)));
+           // roles.add(roleRepository.findByName(RoleName.ROLE_USER)
+                   // .orElseThrow(() -> new AppException(USER_ROLE_NOT_SET)));
 
         System.out.println("chake1");
         user.setRoles(roles);
@@ -131,12 +131,5 @@ public class AuthController {
                 .buildAndExpand(result.getId()).toUri();
         System.out.println("chake1");
         return ResponseEntity.created(location).body(new ApiResponse(Boolean.TRUE, "User registered successfully"));
-    }
-
-
-    @RequestMapping(value = "/vilify-token", method = RequestMethod.POST)
-    public ResponseEntity<?> vilifyToken(@RequestHeader("Authorization") String Authorization) throws Exception {
-
-        return ResponseEntity.ok(Authorization);
     }
 }
