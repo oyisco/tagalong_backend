@@ -23,6 +23,9 @@ public class Driver extends Auditable {
     private String email;
     private String password;
     private String city;
+    private String accountNumber;
+    private String accountName;
+    private String bankName;
     @JsonIgnore
     private String driverFCMToken;
     private Boolean verified = false;
