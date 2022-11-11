@@ -36,9 +36,5 @@ public class NotificationController {
 //    public String sendPnsToTopic(@RequestBody NotificationRequestDto notificationRequestDto) {
 //        return notificationService.sendPnsToTopic(notificationRequestDto);
 //    }
-<<<<<<< HEAD
 
-
-=======
->>>>>>> origin/main
 }
