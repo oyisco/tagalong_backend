@@ -22,7 +22,7 @@ public class Photo {
     private String email;
 
     @NotBlank
-    @Column(name = "image")
+    @Column(length = 90000)
     private String image;
 
 }

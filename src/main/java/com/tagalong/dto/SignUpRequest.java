@@ -28,7 +28,6 @@ public class SignUpRequest {
 	@NotBlank
 	@Size(min = 13, max = 40)
 	private String phone;
-
-
 	private Boolean verified;
+	private String accountType;
 }

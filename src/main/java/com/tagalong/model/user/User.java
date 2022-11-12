@@ -27,6 +27,7 @@ public class User {
     private String email;
     private String phone;
     private Boolean verified;
+    private String accountType;
     private boolean status;
     @JsonIgnore
     private String acceptStatus;

@@ -4,10 +4,7 @@ package com.tagalong.controller;
 //import com.tagalong.config.JwtTokenUtil;
 
 import com.tagalong.config.JwtTokenUtil;
-import com.tagalong.dto.ApiResponse;
-import com.tagalong.dto.JwtResponse;
-import com.tagalong.dto.LoginRequest;
-import com.tagalong.dto.SignUpRequest;
+import com.tagalong.dto.*;
 import com.tagalong.exception.AppException;
 import com.tagalong.exception.BlogapiException;
 import com.tagalong.model.repository.RoleRepository;
@@ -36,10 +33,12 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
+import javax.persistence.EntityNotFoundException;
 import javax.validation.Valid;
 import java.net.URI;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 
 @RestController
 @RequestMapping("/api/auth")
@@ -56,13 +55,33 @@ public class AuthController {
 
     @RequestMapping(value = "/signin", method = RequestMethod.POST)
     public ResponseEntity<?> createAuthenticationToken(@RequestBody LoginRequest authenticationRequest) throws Exception {
-        authenticate(authenticationRequest.getUsernameOrEmail(), authenticationRequest.getPassword());
-        final UserDetails userDetails = userDetailsService
-                .loadUserByUsername(authenticationRequest.getUsernameOrEmail());
-        final String token = jwtTokenUtil.generateToken(userDetails);
-        System.out.println("TOKEN " + token);
+        ResponseDTO responseDTO = new ResponseDTO();
+        User userOptional = this.userRepository.findByEmail(authenticationRequest.getUsernameOrEmail()).orElseThrow(() -> new EntityNotFoundException("Could not find entity with id: "));
+        String accountType = userOptional.getAccountType();
+        String accountType1 = authenticationRequest.getAccountTpe();
+        if (accountType.equalsIgnoreCase(accountType1)) {
+            authenticate(authenticationRequest.getUsernameOrEmail(), authenticationRequest.getPassword());
+            final UserDetails userDetails = userDetailsService
+                    .loadUserByUsername(authenticationRequest.getUsernameOrEmail());
+            final String token = jwtTokenUtil.generateToken(userDetails);
+            System.out.println("TOKEN " + token);
+            return ResponseEntity.ok(new JwtResponse("Bearer " + token, authenticationRequest.getUsernameOrEmail()));
+        }
+        if (!accountType.equalsIgnoreCase(accountType1)) {
 
-        return ResponseEntity.ok(new JwtResponse("Bearer " + token, authenticationRequest.getUsernameOrEmail()));
+            responseDTO.setMessage("this account to another does not match your account type ");
+        }
+        return ResponseEntity.ok(responseDTO);
+//            else if (accountType.equalsIgnoreCase("user")) {
+//                authenticate(authenticationRequest.getUsernameOrEmail(), authenticationRequest.getPassword());
+//                final UserDetails userDetails = userDetailsService
+//                        .loadUserByUsername(authenticationRequest.getUsernameOrEmail());
+//                final String token = jwtTokenUtil.generateToken(userDetails);
+//                System.out.println("TOKEN " + token);
+//                return ResponseEntity.ok(new JwtResponse("Bearer " + token, authenticationRequest.getUsernameOrEmail()));
+//            }
+
+
     }
 
     private void authenticate(String username, String password) throws Exception {
@@ -103,6 +122,7 @@ public class AuthController {
 
         User user = new User();
 //		firstName, lastName, email, password, phone, verified
+        user.setAccountType(signUpRequest.getAccountType());
         user.setFirstName(firstName);
         user.setLastName(lastName);
         user.setEmail(email);
@@ -114,13 +134,13 @@ public class AuthController {
         List<Role> roles = new ArrayList<>();
         System.out.println("chake1");
 
-            roles.add(roleRepository.findByName(RoleName.ROLE_USER)
-                    .orElseThrow(() -> new AppException(USER_ROLE_NOT_SET)));
-            //roles.add(roleRepository.findByName(RoleName.ROLE_ADMIN)
-                 //   .orElseThrow(() -> new AppException(USER_ROLE_NOT_SET)));
+        roles.add(roleRepository.findByName(RoleName.ROLE_USER)
+                .orElseThrow(() -> new AppException(USER_ROLE_NOT_SET)));
+        //roles.add(roleRepository.findByName(RoleName.ROLE_ADMIN)
+        //   .orElseThrow(() -> new AppException(USER_ROLE_NOT_SET)));
 
-           // roles.add(roleRepository.findByName(RoleName.ROLE_USER)
-                   // .orElseThrow(() -> new AppException(USER_ROLE_NOT_SET)));
+        // roles.add(roleRepository.findByName(RoleName.ROLE_USER)
+        // .orElseThrow(() -> new AppException(USER_ROLE_NOT_SET)));
 
         System.out.println("chake1");
         user.setRoles(roles);

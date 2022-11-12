@@ -50,27 +50,28 @@ public class DriverService {
      * @throws ConstraintsViolationException if a driver already exists with the given username, ... .
      */
 
-    public Driver create(Driver driverDO) throws ConstraintsViolationException {
-        Driver driver = new Driver();
+    public DriverResponseDTO create(Driver driverDO) throws ConstraintsViolationException {
+        DriverResponseDTO dto = new DriverResponseDTO();
+        User user = new User();
         try {
-
-            driverDO.setVehicleSeat(3);
-            driverDO.setPassword(encoder.encode(driverDO.getPassword()));
-            driver = driverRepository.save(driverDO);
-
-            User user = new User();
+            user.setAccountType(driverDO.getAccountType());
             user.setFirstName(driverDO.getFirstName());
             user.setLastName(driverDO.getLastName());
             user.setEmail(driverDO.getEmail());
             user.setPassword(encoder.encode(driverDO.getPassword()));
             user.setPhone(driverDO.getPhoneNumber());
             user.setVerified(driverDO.getVerified());
+            driverDO.setVehicleSeat(3);
+            driverDO.setPassword(encoder.encode(driverDO.getPassword()));
+            driverRepository.save(driverDO);
             this.userRepository.save(user);
+            dto.setDriver(driverDO);
         } catch (DataIntegrityViolationException e) {
+            dto.setMessage("Error while creating " + e.getMessage());
             LOG.warn("Some constraints are thrown due to driver creation", e);
             throw new ConstraintsViolationException(e.getMessage());
         }
-        return driver;
+        return dto;
     }
 
 
