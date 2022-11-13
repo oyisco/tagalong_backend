@@ -11,5 +11,5 @@ public class LoginRequest {
 
 	@NotBlank
 	private String password;
-	private String accountTpe;
+	private String accountType;
 }

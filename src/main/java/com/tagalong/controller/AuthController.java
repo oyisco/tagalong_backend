@@ -58,7 +58,7 @@ public class AuthController {
         ResponseDTO responseDTO = new ResponseDTO();
         User userOptional = this.userRepository.findByEmail(authenticationRequest.getUsernameOrEmail()).orElseThrow(() -> new EntityNotFoundException("Could not find entity with id: "));
         String accountType = userOptional.getAccountType();
-        String accountType1 = authenticationRequest.getAccountTpe();
+        String accountType1 = authenticationRequest.getAccountType();
         if (accountType.equalsIgnoreCase(accountType1)) {
             authenticate(authenticationRequest.getUsernameOrEmail(), authenticationRequest.getPassword());
             final UserDetails userDetails = userDetailsService

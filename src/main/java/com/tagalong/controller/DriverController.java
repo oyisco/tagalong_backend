@@ -37,7 +37,7 @@ public class DriverController {
 
 
     @PostMapping("/create-driver")
-    public ResponseEntity<Driver> createDriver(@Valid @RequestBody Driver driver) throws ConstraintsViolationException {
+    public ResponseEntity<DriverResponseDTO> createDriver(@Valid @RequestBody Driver driver) throws ConstraintsViolationException {
 
         return ResponseEntity.ok(this.driverService.create(driver));
     }
