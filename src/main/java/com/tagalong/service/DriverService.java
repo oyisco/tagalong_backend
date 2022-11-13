@@ -102,7 +102,7 @@ public class DriverService {
     @Transactional
     public void updateLocation(DriverUpdateLocation updateLocation) throws EntityNotFoundException {
         Optional<Driver> driverDO1 = this.driverRepository.findByEmail(updateLocation.getDriverEmail());
-        if(driverDO1.isPresent()) {
+        if (driverDO1.isPresent()) {
             Driver driverDO = driverDO1.get();
             driverDO.setLatitudeDriverFrom(updateLocation.getLatitudeDriverFrom());
             driverDO.setLongitudeDriverFrom(updateLocation.getLongitudeDriverFrom());
@@ -112,7 +112,23 @@ public class DriverService {
             driverDO.setDriverFCMToken(updateLocation.getDriverFCMToken());
             driverDO.setVehicleSeat(updateLocation.getVehicleSeat());
             driverRepository.save(driverDO);
-}}
+        }
+    }
+
+
+    @Transactional
+    public void goOffLine(DriverUpdateLocation driverUpdateLocation) throws EntityNotFoundException {
+        Optional<Driver> driverDO1 = this.driverRepository.findByEmail(driverUpdateLocation.getDriverEmail());
+        if (driverDO1.isPresent()) {
+            Driver driverDO = driverDO1.get();
+            driverDO.setLatitudeDriverFrom(driverUpdateLocation.getLatitudeDriverFrom());
+            driverDO.setLongitudeDriverFrom(driverUpdateLocation.getLongitudeDriverFrom());
+            driverDO.setLatitudeDriverTo(driverUpdateLocation.getLatitudeDriverTo());
+            driverDO.setLongitudeDriverTo(driverUpdateLocation.getLongitudeDriverTo());
+            driverDO.setOnlineStatus(OnlineStatus.OFFLINE);
+            driverRepository.save(driverDO);
+        }
+    }
 
 
     @Transactional

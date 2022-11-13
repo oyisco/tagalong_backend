@@ -91,4 +91,9 @@ public class DriverController {
     }
 
 
+    @PutMapping("/go-offline")
+    public void goOffline(@RequestBody DriverUpdateLocation driverUpdateLocation, @RequestHeader("Authorization") String Authorization) {
+        driverService.goOffLine(driverUpdateLocation);
+    }
+
 }
