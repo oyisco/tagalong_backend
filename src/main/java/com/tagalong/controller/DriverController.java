@@ -49,7 +49,7 @@ public class DriverController {
     }
 
 
-    @PutMapping
+    @PutMapping("/update-driver-information")
     public void updateUpdateInformation(@RequestBody DriverUpdateLocation updateDriverLocation, @RequestHeader("Authorization") String Authorization) {
         driverService.updateLocation(updateDriverLocation);
     }

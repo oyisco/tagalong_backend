@@ -101,16 +101,18 @@ public class DriverService {
 
     @Transactional
     public void updateLocation(DriverUpdateLocation updateLocation) throws EntityNotFoundException {
-        Driver driverDO = this.driverRepository.findByEmail(updateLocation.getDriverEmail()).orElseThrow(() -> new EntityNotFoundException("Could not find entity with id: "));
-        driverDO.setLatitudeDriverFrom(updateLocation.getLatitudeDriverFrom());
-        driverDO.setLongitudeDriverFrom(updateLocation.getLongitudeDriverFrom());
-        driverDO.setLatitudeDriverTo(updateLocation.getLatitudeDriverTo());
-        driverDO.setLongitudeDriverTo(updateLocation.getLongitudeDriverTo());
-        driverDO.setOnlineStatus(OnlineStatus.ONLINE);
-        driverDO.setDriverFCMToken(updateLocation.getDriverFCMToken());
-        driverDO.setVehicleSeat(updateLocation.getVehicleSeat());
-        driverRepository.save(driverDO);
-    }
+        Optional<Driver> driverDO1 = this.driverRepository.findByEmail(updateLocation.getDriverEmail());
+        if(driverDO1.isPresent()) {
+            Driver driverDO = driverDO1.get();
+            driverDO.setLatitudeDriverFrom(updateLocation.getLatitudeDriverFrom());
+            driverDO.setLongitudeDriverFrom(updateLocation.getLongitudeDriverFrom());
+            driverDO.setLatitudeDriverTo(updateLocation.getLatitudeDriverTo());
+            driverDO.setLongitudeDriverTo(updateLocation.getLongitudeDriverTo());
+            driverDO.setOnlineStatus(OnlineStatus.ONLINE);
+            driverDO.setDriverFCMToken(updateLocation.getDriverFCMToken());
+            driverDO.setVehicleSeat(updateLocation.getVehicleSeat());
+            driverRepository.save(driverDO);
+}}
 
 
     @Transactional
