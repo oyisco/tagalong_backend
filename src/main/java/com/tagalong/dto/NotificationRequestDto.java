@@ -8,8 +8,6 @@ public class NotificationRequestDto {
 
     private String fcmToken;
 
-    private String deviceId;
-
     private String title;
     private String body;
 }

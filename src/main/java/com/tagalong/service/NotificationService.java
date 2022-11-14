@@ -73,8 +73,6 @@ public class NotificationService {
 
                 .setToken(notificationRequestDto.getFcmToken())
 
-                .setToken(notificationRequestDto.getDeviceId())
-
                 .setNotification(new Notification(notificationRequestDto.getTitle(), notificationRequestDto.getBody()))
                 .putData("content", notificationRequestDto.getTitle())
                 .putData("body", notificationRequestDto.getBody())
