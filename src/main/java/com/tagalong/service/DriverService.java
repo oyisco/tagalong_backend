@@ -131,9 +131,31 @@ public class DriverService {
     }
 
 
+//
+//    public  acceptRequest(String driverEmail) throws EntityNotFoundException {
+//        Request request = this.requestRepository.findByDriverEmailAndStatus(driverEmail, "matchFound").orElseThrow(() -> new EntityNotFoundException("Could not find entity with id: "));
+//        // driverDO.setAcceptStatus("Accepted");
+//        Optional<User> user = this.userRepository.findByEmail(request.getUserEmail());
+//        if (user.isPresent()) {
+//            User user1 = user.get();
+//            user1.setAcceptStatus("ride started");
+//            this.userRepository.save(user1);
+//            NotificationRequestDto notificationRequestDto = new NotificationRequestDto();
+//            notificationRequestDto.setFcmToken(user1.getPassengerFCMToken());
+//            notificationRequestDto.setBody("your request has been accepted from " + findDriverByEmail(driverEmail).getFirstName() + " " + findDriverByEmail(driverEmail).getLastName());
+//            notificationRequestDto.setTitle("accepted request");
+//            this.notificationService.sendPnsToDevice(notificationRequestDto);
+//        }
+//        Driver driver = findDriverByEmail(driverEmail);
+//        driver.setAcceptStatus("Accepted");
+//        driverRepository.save(driver);
+//        this.requestRepository.save(request);
+//    }
+
+
     @Transactional
-    public void acceptRequest(String driverEmail) throws EntityNotFoundException {
-        Request request = this.requestRepository.findByDriverEmailAndStatus(driverEmail, "matchFound").orElseThrow(() -> new EntityNotFoundException("Could not find entity with id: "));
+    public void acceptRequest(String driverEmail,String passengerEmail) throws EntityNotFoundException {
+        Request request = this.requestRepository.findByDriverEmailAndUserEmailAndStatus(driverEmail, passengerEmail,"matchFound").orElseThrow(() -> new EntityNotFoundException("Could not find entity with id: "));
         // driverDO.setAcceptStatus("Accepted");
         Optional<User> user = this.userRepository.findByEmail(request.getUserEmail());
         if (user.isPresent()) {
@@ -153,8 +175,8 @@ public class DriverService {
     }
 
     @Transactional
-    public void rejectRequest(String driverEmail) throws EntityNotFoundException {
-        Request request = this.requestRepository.findByDriverEmailAndStatus(driverEmail, "matchFound").orElseThrow(() -> new EntityNotFoundException("Could not find entity with id: "));
+    public void rejectRequest(String driverEmail,String  passengerEmail) throws EntityNotFoundException {
+        Request request = this.requestRepository.findByDriverEmailAndUserEmailAndStatus(driverEmail, passengerEmail,"matchFound").orElseThrow(() -> new EntityNotFoundException("Could not find entity with id: "));
         // driverDO.setAcceptStatus("Accepted");
         request.setStatus("matchRejected");
 
@@ -177,7 +199,7 @@ public class DriverService {
 
     @Transactional
     public void startRide(StartRideDto startRideDto) throws EntityNotFoundException {
-        Request request = this.requestRepository.findByDriverEmailAndStatus(startRideDto.getDriverEmail(), "matchFound").orElseThrow(() -> new EntityNotFoundException("Could not find entity with id: "));
+        Request request = this.requestRepository.findByDriverEmailAndUserEmailAndStatus(startRideDto.getDriverEmail(), startRideDto.getPassengerEmail(),"matchFound").orElseThrow(() -> new EntityNotFoundException("Could not find entity with id: "));
         // driverDO.setAcceptStatus("Accepted");
         request.setStatus("startRide");
         request.setTimeOfPickUp(LocalDateTime.now());
@@ -201,7 +223,7 @@ public class DriverService {
 
     @Transactional
     public void endRide(EndDto endDto) throws EntityNotFoundException {
-        Request request = this.requestRepository.findByDriverEmailAndStatus(endDto.getDriverEmail(), "matchFound").orElseThrow(() -> new EntityNotFoundException("Could not find entity with id: "));
+        Request request = this.requestRepository.findByDriverEmailAndUserEmailAndStatus(endDto.getDriverEmail(),endDto.getPassengerEmail(), "matchFound").orElseThrow(() -> new EntityNotFoundException("Could not find entity with id: "));
         // driverDO.setAcceptStatus("Accepted");
         request.setStatus("endRide");
         request.setDropOffTime(LocalDateTime.now());
@@ -256,5 +278,12 @@ public class DriverService {
                 .findByEmail(driverEmail)
                 .orElseThrow(() -> new EntityNotFoundException("Could not find entity with id: " + driverEmail));
     }
+
+    public List<Request> getMatchPassengerByDriverEmail(String driverEmail) throws EntityNotFoundException {
+        return requestRepository.getRequestByDriverEmailAndStatus(driverEmail,"matchFound");
+
+    }
+
+
 
 }

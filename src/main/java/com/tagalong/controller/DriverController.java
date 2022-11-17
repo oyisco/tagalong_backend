@@ -6,6 +6,7 @@ import com.tagalong.exception.CarAlreadyInUseException;
 import com.tagalong.exception.ConstraintsViolationException;
 import com.tagalong.exception.EntityNotFoundException;
 import com.tagalong.model.Driver;
+import com.tagalong.model.Request;
 import com.tagalong.service.DriverService;
 import io.swagger.annotations.Authorization;
 import lombok.RequiredArgsConstructor;
@@ -61,16 +62,16 @@ public class DriverController {
     }
 
     @GetMapping("/accept-request")
-    public void acceptRequest(@RequestParam String driverEmail, @RequestHeader("Authorization") String Authorization) {
+    public void acceptRequest(@RequestParam String driverEmail,@RequestParam String passengerEmail, @RequestHeader("Authorization") String Authorization) {
 
 
-        driverService.acceptRequest(driverEmail);
+        driverService.acceptRequest(driverEmail,passengerEmail);
     }
 
     @GetMapping("/reject-request")
-    public void rejectRequest(@RequestParam String driverEmail, @RequestHeader("Authorization") String Authorization) {
+    public void rejectRequest(@RequestParam String driverEmail,@RequestParam String passengerEmail, @RequestHeader("Authorization") String Authorization) {
 
-        driverService.rejectRequest(driverEmail);
+        driverService.rejectRequest(driverEmail,passengerEmail);
     }
 
     @PostMapping("/start-ride")
@@ -96,4 +97,9 @@ public class DriverController {
         driverService.goOffLine(driverUpdateLocation);
     }
 
+
+    @PutMapping("/match-passenger")
+    public List<Request> getMatchPassengerByDriverEmail(@RequestParam String email, @RequestHeader("Authorization") String Authorization) {
+        return driverService.getMatchPassengerByDriverEmail(email);
+    }
 }

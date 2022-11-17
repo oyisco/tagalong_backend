@@ -27,6 +27,8 @@ public class Request extends Auditable {
     private String pickUpAddress;
     private String dropOffAddress;
     private LocalDateTime dropOffTime;
+    private String duration;
+    private String distance;
     private double amountPaid;
 
 

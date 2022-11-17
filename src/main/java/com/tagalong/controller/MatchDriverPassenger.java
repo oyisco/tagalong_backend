@@ -102,8 +102,10 @@ public class MatchDriverPassenger {
                     //trip.setStatus("Booked");
                     this.driverRepository.save(driver);
                     Request request = new Request();
+                    request.setDuration(directionsStep.duration.toString());
+                    request.setDistance(directionsStep.distance.toString());
                     request.setDriverEmail(driver.getEmail());
-                    request.setUserEmail(passenger.getEmail());
+                    request.setUserEmail(Objects.requireNonNull(passenger).getEmail());
                     request.setLatitudePassengerFrom(geolocationDto.getLatitudePassengerFrom());
                     request.setLatitudePassengerFrom(geolocationDto.getLongitudePassengerFrom());
                     request.setLatitudePassengerTo(geolocationDto.getLatitudePassengerTo());
