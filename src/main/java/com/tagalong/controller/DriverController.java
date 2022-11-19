@@ -62,16 +62,16 @@ public class DriverController {
     }
 
     @GetMapping("/accept-request")
-    public void acceptRequest(@RequestParam String driverEmail,@RequestParam String passengerEmail, @RequestHeader("Authorization") String Authorization) {
+    public void acceptRequest(@RequestParam String driverEmail, @RequestParam String passengerEmail, @RequestHeader("Authorization") String Authorization) {
 
 
-        driverService.acceptRequest(driverEmail,passengerEmail);
+        driverService.acceptRequest(driverEmail, passengerEmail);
     }
 
     @GetMapping("/reject-request")
-    public void rejectRequest(@RequestParam String driverEmail,@RequestParam String passengerEmail, @RequestHeader("Authorization") String Authorization) {
+    public void rejectRequest(@RequestParam String driverEmail, @RequestParam String passengerEmail, @RequestHeader("Authorization") String Authorization) {
 
-        driverService.rejectRequest(driverEmail,passengerEmail);
+        driverService.rejectRequest(driverEmail, passengerEmail);
     }
 
     @PostMapping("/start-ride")
@@ -82,8 +82,13 @@ public class DriverController {
 
     @PostMapping("/end-ride")
     public void endRide(@RequestBody EndDto endDto, @RequestHeader("Authorization") String Authorization) {
-
         driverService.endRide(endDto);
+    }
+
+    @PostMapping("/not-accepted")
+    public void notAccept(@RequestParam String driverEmail, @RequestParam String passengerEmail, @RequestHeader("Authorization") String Authorization) {
+
+        driverService.notAccepted(driverEmail, passengerEmail);
     }
 
     @GetMapping("/trip-history")
@@ -98,8 +103,8 @@ public class DriverController {
     }
 
 
-    @PutMapping("/match-passenger")
-    public List<Request> getMatchPassengerByDriverEmail(@RequestParam String email, @RequestHeader("Authorization") String Authorization) {
+    @GetMapping("/match-passenger")
+    public List<MatcherDto2> getMatchPassengerByDriverEmail(@RequestParam String email, @RequestHeader("Authorization") String Authorization) {
         return driverService.getMatchPassengerByDriverEmail(email);
     }
 }

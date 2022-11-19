@@ -4,13 +4,16 @@ package com.tagalong.service;
 import com.tagalong.dto.*;
 import com.tagalong.exception.ConstraintsViolationException;
 import com.tagalong.model.Driver;
+import com.tagalong.model.Photo;
 import com.tagalong.model.Request;
 import com.tagalong.model.repository.DriverRepository;
+import com.tagalong.model.repository.PhotoRepository;
 import com.tagalong.model.repository.RequestRepository;
 import com.tagalong.model.repository.UserRepository;
 import com.tagalong.model.user.User;
 import lombok.RequiredArgsConstructor;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.support.ManagedList;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
@@ -35,6 +38,7 @@ public class DriverService {
     private final UserRepository userRepository;
     private final NotificationService notificationService;
     private final RequestRepository requestRepository;
+    private final PhotoRepository photoRepository;
 
 
     public Driver find(Long driverId) throws EntityNotFoundException {
@@ -154,8 +158,8 @@ public class DriverService {
 
 
     @Transactional
-    public void acceptRequest(String driverEmail,String passengerEmail) throws EntityNotFoundException {
-        Request request = this.requestRepository.findByDriverEmailAndUserEmailAndStatus(driverEmail, passengerEmail,"matchFound").orElseThrow(() -> new EntityNotFoundException("Could not find entity with id: "));
+    public void acceptRequest(String driverEmail, String passengerEmail) throws EntityNotFoundException {
+        Request request = this.requestRepository.findByDriverEmailAndUserEmailAndStatus(driverEmail, passengerEmail, "matchFound").orElseThrow(() -> new EntityNotFoundException("Could not find entity with id: "));
         // driverDO.setAcceptStatus("Accepted");
         Optional<User> user = this.userRepository.findByEmail(request.getUserEmail());
         if (user.isPresent()) {
@@ -175,8 +179,8 @@ public class DriverService {
     }
 
     @Transactional
-    public void rejectRequest(String driverEmail,String  passengerEmail) throws EntityNotFoundException {
-        Request request = this.requestRepository.findByDriverEmailAndUserEmailAndStatus(driverEmail, passengerEmail,"matchFound").orElseThrow(() -> new EntityNotFoundException("Could not find entity with id: "));
+    public void rejectRequest(String driverEmail, String passengerEmail) throws EntityNotFoundException {
+        Request request = this.requestRepository.findByDriverEmailAndUserEmailAndStatus(driverEmail, passengerEmail, "matchFound").orElseThrow(() -> new EntityNotFoundException("Could not find entity with id: "));
         // driverDO.setAcceptStatus("Accepted");
         request.setStatus("matchRejected");
 
@@ -199,7 +203,7 @@ public class DriverService {
 
     @Transactional
     public void startRide(StartRideDto startRideDto) throws EntityNotFoundException {
-        Request request = this.requestRepository.findByDriverEmailAndUserEmailAndStatus(startRideDto.getDriverEmail(), startRideDto.getPassengerEmail(),"matchFound").orElseThrow(() -> new EntityNotFoundException("Could not find entity with id: "));
+        Request request = this.requestRepository.findByDriverEmailAndUserEmailAndStatus(startRideDto.getDriverEmail(), startRideDto.getPassengerEmail(), "matchFound").orElseThrow(() -> new EntityNotFoundException("Could not find entity with id: "));
         // driverDO.setAcceptStatus("Accepted");
         request.setStatus("startRide");
         request.setTimeOfPickUp(LocalDateTime.now());
@@ -223,7 +227,7 @@ public class DriverService {
 
     @Transactional
     public void endRide(EndDto endDto) throws EntityNotFoundException {
-        Request request = this.requestRepository.findByDriverEmailAndUserEmailAndStatus(endDto.getDriverEmail(),endDto.getPassengerEmail(), "matchFound").orElseThrow(() -> new EntityNotFoundException("Could not find entity with id: "));
+        Request request = this.requestRepository.findByDriverEmailAndUserEmailAndStatus(endDto.getDriverEmail(), endDto.getPassengerEmail(), "matchFound").orElseThrow(() -> new EntityNotFoundException("Could not find entity with id: "));
         // driverDO.setAcceptStatus("Accepted");
         request.setStatus("endRide");
         request.setDropOffTime(LocalDateTime.now());
@@ -279,11 +283,60 @@ public class DriverService {
                 .orElseThrow(() -> new EntityNotFoundException("Could not find entity with id: " + driverEmail));
     }
 
-    public List<Request> getMatchPassengerByDriverEmail(String driverEmail) throws EntityNotFoundException {
-        return requestRepository.getRequestByDriverEmailAndStatus(driverEmail,"matchFound");
+    public List<MatcherDto2> getMatchPassengerByDriverEmail(String driverEmail) throws EntityNotFoundException {
+        List<MatcherDto2> matcherDto2s = new ArrayList<>();
+        List<Request> requests = requestRepository.getRequestByDriverEmailAndStatus(driverEmail, "matchFound");
+        requests.forEach(request -> {
+            User user = this.userRepository.findByEmail(request.getUserEmail()).orElseThrow(() -> new EntityNotFoundException("Could not find entity with id: "));
+            Photo photo = this.photoRepository.findById(request.getUserEmail()).orElseThrow(() -> new EntityNotFoundException("Could not find entity with id: "));
+            MatcherDto2 matcherDto2 = new MatcherDto2();
+            matcherDto2.setUserEmail(request.getUserEmail());
+            matcherDto2.setFirstName(user.getFirstName());
+            matcherDto2.setLastName(user.getLastName());
+            matcherDto2.setImage(photo.getImage());
+            matcherDto2.setPhoneNumber(user.getPhone());
+            matcherDto2.setStatus(request.getStatus());
+            matcherDto2.setLatitudePassengerFrom(request.getLatitudePassengerFrom());
+            matcherDto2.setLongitudePassengerFrom(request.getLongitudePassengerFrom());
+            matcherDto2.setLatitudePassengerTo(request.getLatitudePassengerTo());
+            matcherDto2.setLongitudePassengerTo(request.getLongitudePassengerTo());
+            matcherDto2.setTimeOfPickUp(request.getTimeOfPickUp());
+            matcherDto2.setAmountPaid(request.getAmountPaid());
+            matcherDto2.setDropOffAddress(request.getDropOffAddress());
+            matcherDto2.setPickUpAddress(request.getPickUpAddress());
+            matcherDto2.setDistance(request.getDistance());
+            matcherDto2.setDuration(request.getDuration());
+            matcherDto2.setDropOffTime(request.getDropOffTime());
+            matcherDto2s.add(matcherDto2);
+        });
+
+
+        return matcherDto2s;
 
     }
 
 
+    @Transactional
+    public void notAccepted(String driverEmail, String passengerEmail) throws EntityNotFoundException {
+        Request request = this.requestRepository.findByDriverEmailAndUserEmailAndStatus(driverEmail, passengerEmail, "matchFound").orElseThrow(() -> new EntityNotFoundException("Could not find entity with id: "));
+        // driverDO.setAcceptStatus("Accepted");
+        request.setStatus("not accepted");
+
+        Optional<User> user = this.userRepository.findByEmail(request.getUserEmail());
+        if (user.isPresent()) {
+            User user1 = user.get();
+            user1.setAcceptStatus("not accepted");
+            this.userRepository.save(user1);
+            NotificationRequestDto notificationRequestDto = new NotificationRequestDto();
+            notificationRequestDto.setFcmToken(user1.getPassengerFCMToken());
+            notificationRequestDto.setBody("your request has been not been accepted from " + findDriverByEmail(driverEmail).getFirstName() + " " + findDriverByEmail(driverEmail).getLastName());
+            notificationRequestDto.setTitle("rejected request");
+            this.notificationService.sendPnsToDevice(notificationRequestDto);
+        }
+        Driver driver = findDriverByEmail(driverEmail);
+        driver.setAcceptStatus("rejected request");
+        driverRepository.save(driver);
+        this.requestRepository.save(request);
+    }
 
 }

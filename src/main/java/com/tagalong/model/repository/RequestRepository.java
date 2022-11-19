@@ -15,5 +15,6 @@ public interface RequestRepository extends JpaRepository<Request, Long> {
     //@Query("SELECT r FROM request r WHERE r.driver_email = ?1 OR r.user_email = ?2")
     List<Request>  findByDriverEmailOrUserEmail(String email1, String email2);
 
+    Request getRequestByDriverEmailAndUserEmailAndStatus(String  driverEmail, String  passengerEmail,String  status);
 
 }

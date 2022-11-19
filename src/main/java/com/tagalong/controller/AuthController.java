@@ -14,8 +14,9 @@ import com.tagalong.model.role.RoleName;
 import com.tagalong.model.user.User;
 //import com.tagalong.service.JwtUserDetailsService;
 import com.tagalong.service.JwtUserDetailsService;
+import io.jsonwebtoken.*;
 import lombok.RequiredArgsConstructor;
-import org.springframework.beans.factory.annotation.Autowired;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 //import org.springframework.security.authentication.AuthenticationManager;
@@ -37,20 +38,24 @@ import javax.persistence.EntityNotFoundException;
 import javax.validation.Valid;
 import java.net.URI;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
-import java.util.Optional;
+import java.util.function.Function;
 
 @RestController
 @RequestMapping("/api/auth")
 @RequiredArgsConstructor
+@Slf4j
 public class AuthController {
     private static final String USER_ROLE_NOT_SET = "User role not set";
+    private static final String SECRET = "PH3gdtPrssPH3gdtPrssPH3gdtPrssPH3gdtPrssPH3gdtPrssPH3gdtPrssPH3gdtPrssPH3gdtPrssPrssPH3gdtPrss";
     private final AuthenticationManager authenticationManager;
     private final UserRepository userRepository;
     private final RoleRepository roleRepository;
     private final JwtUserDetailsService userDetailsService;
     private final PasswordEncoder bcryptEncoder;
     private final JwtTokenUtil jwtTokenUtil;
+    //private final TokenService tokenService;
 
 
     @RequestMapping(value = "/signin", method = RequestMethod.POST)
@@ -152,4 +157,69 @@ public class AuthController {
         System.out.println("chake1");
         return ResponseEntity.created(location).body(new ApiResponse(Boolean.TRUE, "User registered successfully"));
     }
+
+
+    //check if the token has expired
+    @GetMapping("verify-jwt-token")
+    private Boolean isTokenExpired(String token) {
+        final Date expiration = getExpirationDateFromToken(token);
+        return expiration.before(new Date());
+    }
+
+    //retrieve expiration date from jwt token
+    public Date getExpirationDateFromToken(String token) {
+        return getClaimFromToken(token, Claims::getExpiration);
+    }
+
+    public <T> T getClaimFromToken(String token, Function<Claims, T> claimsResolver) {
+        final Claims claims = getAllClaimsFromToken(token);
+        return claimsResolver.apply(claims);
+    }
+
+    private Claims getAllClaimsFromToken(String token) {
+        return Jwts.parser().setSigningKey(SECRET).parseClaimsJws(token).getBody();
+    }
+
+//
+//    public void deleteToken(String key) {
+//        this.tokenService.delete(key);
+//    }
+
+//
+//    @GetMapping("verify-jwt-token")
+//    public boolean validateToken(@RequestParam String token) {
+//        try {
+//            Jwts.parser().setSigningKey(SECRET).parseClaimsJws(token);
+//            return true;
+//        } catch (MalformedJwtException ex) {
+//            log.info("Invalid JWT token");
+//        } catch (ExpiredJwtException ex) {
+//            log.info("Expired JWT token");
+//            //  httpServletRequest.setAttribute("expired",ex.getMessage());
+//        } catch (UnsupportedJwtException ex) {
+//            log.info("Unsupported JWT exception");
+//        } catch (IllegalArgumentException ex) {
+//            log.info("Jwt claims string is empty");
+//        }
+//        return false;
+//    }
+
+//    public boolean validateToken(String token) {
+//        try {
+//            Jwts.parser().setSigningKey(SECRET).parseClaimsJws(token);
+//            return true;
+//        } catch (MalformedJwtException ex) {
+//            log.info("Invalid JWT token");
+//        } catch (ExpiredJwtException ex) {
+//            log.info("Expired JWT token");
+//            //  httpServletRequest.setAttribute("expired",ex.getMessage());
+//        } catch (UnsupportedJwtException ex) {
+//            log.info("Unsupported JWT exception");
+//        } catch (IllegalArgumentException ex) {
+//            log.info("Jwt claims string is empty");
+//        }
+//        return false;
+//    }
+
+
 }

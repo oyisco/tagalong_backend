@@ -100,20 +100,26 @@ public class MatchDriverPassenger {
                     map.setDistance(directionsStep.distance.toString());
                     // driver.setIsAvailable(Boolean.TRUE);
                     //trip.setStatus("Booked");
-                    this.driverRepository.save(driver);
-                    Request request = new Request();
-                    request.setDuration(directionsStep.duration.toString());
-                    request.setDistance(directionsStep.distance.toString());
-                    request.setDriverEmail(driver.getEmail());
-                    request.setUserEmail(Objects.requireNonNull(passenger).getEmail());
-                    request.setLatitudePassengerFrom(geolocationDto.getLatitudePassengerFrom());
-                    request.setLatitudePassengerFrom(geolocationDto.getLongitudePassengerFrom());
-                    request.setLatitudePassengerTo(geolocationDto.getLatitudePassengerTo());
-                    request.setLongitudePassengerFrom(geolocationDto.getLongitudePassengerFrom());
-                    request.setStatus("matchFound");
-                    passenger.setPassengerFCMToken(geolocationDto.getPassengerFCMToken());
-                    this.userRepository.save(passenger);
-                    this.requestRepository.save(request);
+
+                    Request request1 = this.requestRepository.getRequestByDriverEmailAndUserEmailAndStatus(driver.getEmail(), Objects.requireNonNull(passenger).getEmail(), "matchFound");
+                    if (request1 != null) {
+                        map.setMessage("Request Already exist");
+                    } else {
+                        Request request = new Request();
+                        request.setDuration(directionsStep.duration.toString());
+                        request.setDistance(directionsStep.distance.toString());
+                        request.setDriverEmail(driver.getEmail());
+                        request.setUserEmail(Objects.requireNonNull(passenger).getEmail());
+                        request.setLatitudePassengerFrom(geolocationDto.getLatitudePassengerFrom());
+                        request.setLatitudePassengerFrom(geolocationDto.getLongitudePassengerFrom());
+                        request.setLatitudePassengerTo(geolocationDto.getLatitudePassengerTo());
+                        request.setLongitudePassengerFrom(geolocationDto.getLongitudePassengerFrom());
+                        request.setStatus("matchFound");
+                        passenger.setPassengerFCMToken(geolocationDto.getPassengerFCMToken());
+                        this.driverRepository.save(driver);
+                        this.userRepository.save(passenger);
+                        this.requestRepository.save(request);
+                    }
                     /*
                     Title: New ride request
 Body: You have a new request from {passenger Name}
