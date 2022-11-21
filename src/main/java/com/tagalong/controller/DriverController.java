@@ -107,4 +107,17 @@ public class DriverController {
     public List<MatcherDto2> getMatchPassengerByDriverEmail(@RequestParam String email, @RequestHeader("Authorization") String Authorization) {
         return driverService.getMatchPassengerByDriverEmail(email);
     }
+
+
+    @GetMapping("/get-all-accepted-request")
+    public List<MatcherDto2> getAllAccepted(@RequestParam String email, @RequestHeader("Authorization") String Authorization) {
+        return driverService.getAllAccepted(email);
+    }
+
+    @GetMapping("/get-all-started-trip")
+    public List<MatcherDto2> getAllStartedTrip(@RequestParam String email, @RequestHeader("Authorization") String Authorization) {
+        return driverService.getAllStartedTrip(email);
+    }
+
+
 }

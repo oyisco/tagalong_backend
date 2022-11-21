@@ -161,6 +161,7 @@ public class DriverService {
     public void acceptRequest(String driverEmail, String passengerEmail) throws EntityNotFoundException {
         Request request = this.requestRepository.findByDriverEmailAndUserEmailAndStatus(driverEmail, passengerEmail, "matchFound").orElseThrow(() -> new EntityNotFoundException("Could not find entity with id: "));
         // driverDO.setAcceptStatus("Accepted");
+        request.setStatus("accepted");
         Optional<User> user = this.userRepository.findByEmail(request.getUserEmail());
         if (user.isPresent()) {
             User user1 = user.get();
@@ -339,4 +340,70 @@ public class DriverService {
         this.requestRepository.save(request);
     }
 
+
+
+
+    public List<MatcherDto2> getAllAccepted(String driverEmail) throws EntityNotFoundException {
+        List<MatcherDto2> matcherDto2s = new ArrayList<>();
+        List<Request> requests = requestRepository.getRequestByDriverEmailAndStatus(driverEmail, "accepted");
+        requests.forEach(request -> {
+            User user = this.userRepository.findByEmail(request.getUserEmail()).orElseThrow(() -> new EntityNotFoundException("Could not find entity with id: "));
+            Photo photo = this.photoRepository.findById(request.getUserEmail()).orElseThrow(() -> new EntityNotFoundException("Could not find entity with id: "));
+            MatcherDto2 matcherDto2 = new MatcherDto2();
+            matcherDto2.setUserEmail(request.getUserEmail());
+            matcherDto2.setFirstName(user.getFirstName());
+            matcherDto2.setLastName(user.getLastName());
+            matcherDto2.setImage(photo.getImage());
+            matcherDto2.setPhoneNumber(user.getPhone());
+            matcherDto2.setStatus(request.getStatus());
+            matcherDto2.setLatitudePassengerFrom(request.getLatitudePassengerFrom());
+            matcherDto2.setLongitudePassengerFrom(request.getLongitudePassengerFrom());
+            matcherDto2.setLatitudePassengerTo(request.getLatitudePassengerTo());
+            matcherDto2.setLongitudePassengerTo(request.getLongitudePassengerTo());
+            matcherDto2.setTimeOfPickUp(request.getTimeOfPickUp());
+            matcherDto2.setAmountPaid(request.getAmountPaid());
+            matcherDto2.setDropOffAddress(request.getDropOffAddress());
+            matcherDto2.setPickUpAddress(request.getPickUpAddress());
+            matcherDto2.setDistance(request.getDistance());
+            matcherDto2.setDuration(request.getDuration());
+            matcherDto2.setDropOffTime(request.getDropOffTime());
+            matcherDto2s.add(matcherDto2);
+        });
+
+
+        return matcherDto2s;
+
+    }
+
+    public List<MatcherDto2> getAllStartedTrip(String driverEmail) throws EntityNotFoundException {
+        List<MatcherDto2> matcherDto2s = new ArrayList<>();
+        List<Request> requests = requestRepository.getRequestByDriverEmailAndStatus(driverEmail, "accepted");
+        requests.forEach(request -> {
+            User user = this.userRepository.findByEmail(request.getUserEmail()).orElseThrow(() -> new EntityNotFoundException("Could not find entity with id: "));
+            Photo photo = this.photoRepository.findById(request.getUserEmail()).orElseThrow(() -> new EntityNotFoundException("Could not find entity with id: "));
+            MatcherDto2 matcherDto2 = new MatcherDto2();
+            matcherDto2.setUserEmail(request.getUserEmail());
+            matcherDto2.setFirstName(user.getFirstName());
+            matcherDto2.setLastName(user.getLastName());
+            matcherDto2.setImage(photo.getImage());
+            matcherDto2.setPhoneNumber(user.getPhone());
+            matcherDto2.setStatus(request.getStatus());
+            matcherDto2.setLatitudePassengerFrom(request.getLatitudePassengerFrom());
+            matcherDto2.setLongitudePassengerFrom(request.getLongitudePassengerFrom());
+            matcherDto2.setLatitudePassengerTo(request.getLatitudePassengerTo());
+            matcherDto2.setLongitudePassengerTo(request.getLongitudePassengerTo());
+            matcherDto2.setTimeOfPickUp(request.getTimeOfPickUp());
+            matcherDto2.setAmountPaid(request.getAmountPaid());
+            matcherDto2.setDropOffAddress(request.getDropOffAddress());
+            matcherDto2.setPickUpAddress(request.getPickUpAddress());
+            matcherDto2.setDistance(request.getDistance());
+            matcherDto2.setDuration(request.getDuration());
+            matcherDto2.setDropOffTime(request.getDropOffTime());
+            matcherDto2s.add(matcherDto2);
+        });
+
+
+        return matcherDto2s;
+
+    }
 }

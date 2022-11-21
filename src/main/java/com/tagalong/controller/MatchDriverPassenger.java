@@ -86,7 +86,7 @@ public class MatchDriverPassenger {
                 DecimalFormat df = new DecimalFormat("#.0");
                 float roundDistance = Float.parseFloat(df.format(distanceInKm));
 
-                if (roundDistance < 3) {
+                if (roundDistance <= 3) {
 
                     //   List<Driver> driverList1 = this.driverRepository.findStoresWithInDistance(geolocationDto.getLatitudePassengerFrom(), geolocationDto.getLongitudePassengerFrom(), roundDistance);
                     // System.out.println("driverList1 " + driverList1.toString());
@@ -124,11 +124,11 @@ public class MatchDriverPassenger {
                     Title: New ride request
 Body: You have a new request from {passenger Name}
                      */
-                    NotificationRequestDto notificationRequestDto = new NotificationRequestDto();
-                    notificationRequestDto.setFcmToken(driver.getDriverFCMToken());
-                    notificationRequestDto.setBody("You have a new request from " + passenger.getFirstName() + " " + passenger.getLastName());
-                    notificationRequestDto.setTitle("New ride request");
-                    this.notificationService.sendPnsToDevice(notificationRequestDto);
+//                    NotificationRequestDto notificationRequestDto = new NotificationRequestDto();
+//                    notificationRequestDto.setFcmToken(driver.getDriverFCMToken());
+//                    notificationRequestDto.setBody("You have a new request from " + passenger.getFirstName() + " " + passenger.getLastName());
+//                    notificationRequestDto.setTitle("New ride request");
+//                    this.notificationService.sendPnsToDevice(notificationRequestDto);
 
                     // }
                 }
