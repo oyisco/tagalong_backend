@@ -183,12 +183,12 @@ public class DriverService {
     public void rejectRequest(String driverEmail, String passengerEmail) throws EntityNotFoundException {
         Request request = this.requestRepository.findByDriverEmailAndUserEmailAndStatus(driverEmail, passengerEmail, "matchFound").orElseThrow(() -> new EntityNotFoundException("Could not find entity with id: "));
         // driverDO.setAcceptStatus("Accepted");
-        request.setStatus("matchRejected");
+        request.setStatus("rejectedrequest");
 
         Optional<User> user = this.userRepository.findByEmail(request.getUserEmail());
         if (user.isPresent()) {
             User user1 = user.get();
-            user1.setAcceptStatus("ride rejected");
+            user1.setAcceptStatus("rejectedrequest");
             this.userRepository.save(user1);
             NotificationRequestDto notificationRequestDto = new NotificationRequestDto();
             notificationRequestDto.setFcmToken(user1.getPassengerFCMToken());
@@ -197,7 +197,7 @@ public class DriverService {
             this.notificationService.sendPnsToDevice(notificationRequestDto);
         }
         Driver driver = findDriverByEmail(driverEmail);
-        driver.setRejectStatus("rejected request");
+        driver.setRejectStatus("rejectedrequest");
         driverRepository.save(driver);
         this.requestRepository.save(request);
     }
@@ -212,7 +212,7 @@ public class DriverService {
         Optional<User> user = this.userRepository.findByEmail(request.getUserEmail());
         if (user.isPresent()) {
             User user1 = user.get();
-            user1.setAcceptStatus("ride rejected");
+            user1.setAcceptStatus("startRide");
             this.userRepository.save(user1);
             NotificationRequestDto notificationRequestDto = new NotificationRequestDto();
             notificationRequestDto.setFcmToken(user1.getPassengerFCMToken());
@@ -221,7 +221,7 @@ public class DriverService {
             this.notificationService.sendPnsToDevice(notificationRequestDto);
         }
         Driver driver = findDriverByEmail(startRideDto.getDriverEmail());
-        driver.setStartTripStatus("Start trip");
+        driver.setStartTripStatus("startRide");
         driverRepository.save(driver);
         this.requestRepository.save(request);
     }
@@ -237,7 +237,7 @@ public class DriverService {
         Optional<User> user = this.userRepository.findByEmail(request.getUserEmail());
         if (user.isPresent()) {
             User user1 = user.get();
-            user1.setAcceptStatus("ride rejected");
+            user1.setAcceptStatus("endRide");
             this.userRepository.save(user1);
             NotificationRequestDto notificationRequestDto = new NotificationRequestDto();
             notificationRequestDto.setFcmToken(user1.getPassengerFCMToken());
@@ -246,7 +246,7 @@ public class DriverService {
             this.notificationService.sendPnsToDevice(notificationRequestDto);
         }
         Driver driver = findDriverByEmail(endDto.getDriverEmail());
-        driver.setEndTripStatus("End ride");
+        driver.setEndTripStatus("endRide");
         driverRepository.save(driver);
         this.requestRepository.save(request);
     }
@@ -321,12 +321,12 @@ public class DriverService {
     public void notAccepted(String driverEmail, String passengerEmail) throws EntityNotFoundException {
         Request request = this.requestRepository.findByDriverEmailAndUserEmailAndStatus(driverEmail, passengerEmail, "matchFound").orElseThrow(() -> new EntityNotFoundException("Could not find entity with id: "));
         // driverDO.setAcceptStatus("Accepted");
-        request.setStatus("not accepted");
+        request.setStatus("notaccepted");
 
         Optional<User> user = this.userRepository.findByEmail(request.getUserEmail());
         if (user.isPresent()) {
             User user1 = user.get();
-            user1.setAcceptStatus("not accepted");
+            user1.setAcceptStatus("notaccepted");
             this.userRepository.save(user1);
             NotificationRequestDto notificationRequestDto = new NotificationRequestDto();
             notificationRequestDto.setFcmToken(user1.getPassengerFCMToken());
@@ -335,7 +335,7 @@ public class DriverService {
             this.notificationService.sendPnsToDevice(notificationRequestDto);
         }
         Driver driver = findDriverByEmail(driverEmail);
-        driver.setRejectStatus("rejected request");
+        driver.setRejectStatus("notaccepted");
         driverRepository.save(driver);
         this.requestRepository.save(request);
     }
