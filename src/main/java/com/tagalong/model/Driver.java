@@ -53,6 +53,10 @@ public class Driver extends Auditable {
     private String acceptStatus;
     @JsonIgnore
     private String rejectStatus;
+    @JsonIgnore
+    private String endTripStatus;
+    @JsonIgnore
+    private String startTripStatus;
 
 //    private Point points;
 }

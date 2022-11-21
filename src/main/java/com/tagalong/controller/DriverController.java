@@ -109,14 +109,9 @@ public class DriverController {
     }
 
 
-    @GetMapping("/get-all-accepted-request")
+    @GetMapping("/get-all-request")
     public List<MatcherDto2> getAllAccepted(@RequestParam String email, @RequestHeader("Authorization") String Authorization) {
         return driverService.getAllAccepted(email);
-    }
-
-    @GetMapping("/get-all-started-trip")
-    public List<MatcherDto2> getAllStartedTrip(@RequestParam String email, @RequestHeader("Authorization") String Authorization) {
-        return driverService.getAllStartedTrip(email);
     }
 
 

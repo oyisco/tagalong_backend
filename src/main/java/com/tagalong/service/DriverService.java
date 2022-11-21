@@ -165,7 +165,7 @@ public class DriverService {
         Optional<User> user = this.userRepository.findByEmail(request.getUserEmail());
         if (user.isPresent()) {
             User user1 = user.get();
-            user1.setAcceptStatus("ride started");
+            user1.setAcceptStatus("accepted");
             this.userRepository.save(user1);
             NotificationRequestDto notificationRequestDto = new NotificationRequestDto();
             notificationRequestDto.setFcmToken(user1.getPassengerFCMToken());
@@ -174,7 +174,7 @@ public class DriverService {
             this.notificationService.sendPnsToDevice(notificationRequestDto);
         }
         Driver driver = findDriverByEmail(driverEmail);
-        driver.setAcceptStatus("Accepted");
+        driver.setAcceptStatus("accepted");
         driverRepository.save(driver);
         this.requestRepository.save(request);
     }
@@ -197,7 +197,7 @@ public class DriverService {
             this.notificationService.sendPnsToDevice(notificationRequestDto);
         }
         Driver driver = findDriverByEmail(driverEmail);
-        driver.setAcceptStatus("rejected request");
+        driver.setRejectStatus("rejected request");
         driverRepository.save(driver);
         this.requestRepository.save(request);
     }
@@ -221,7 +221,7 @@ public class DriverService {
             this.notificationService.sendPnsToDevice(notificationRequestDto);
         }
         Driver driver = findDriverByEmail(startRideDto.getDriverEmail());
-        driver.setAcceptStatus("Started ride");
+        driver.setStartTripStatus("Start trip");
         driverRepository.save(driver);
         this.requestRepository.save(request);
     }
@@ -246,7 +246,7 @@ public class DriverService {
             this.notificationService.sendPnsToDevice(notificationRequestDto);
         }
         Driver driver = findDriverByEmail(endDto.getDriverEmail());
-        driver.setAcceptStatus("End ride");
+        driver.setEndTripStatus("End ride");
         driverRepository.save(driver);
         this.requestRepository.save(request);
     }
@@ -335,17 +335,15 @@ public class DriverService {
             this.notificationService.sendPnsToDevice(notificationRequestDto);
         }
         Driver driver = findDriverByEmail(driverEmail);
-        driver.setAcceptStatus("rejected request");
+        driver.setRejectStatus("rejected request");
         driverRepository.save(driver);
         this.requestRepository.save(request);
     }
 
 
-
-
     public List<MatcherDto2> getAllAccepted(String driverEmail) throws EntityNotFoundException {
         List<MatcherDto2> matcherDto2s = new ArrayList<>();
-        List<Request> requests = requestRepository.getRequestByDriverEmailAndStatus(driverEmail, "accepted");
+        List<Request> requests = requestRepository.getRequestByDriverEmailAndStatuss(driverEmail, "accepted", "startRide");
         requests.forEach(request -> {
             User user = this.userRepository.findByEmail(request.getUserEmail()).orElseThrow(() -> new EntityNotFoundException("Could not find entity with id: "));
             Photo photo = this.photoRepository.findById(request.getUserEmail()).orElseThrow(() -> new EntityNotFoundException("Could not find entity with id: "));
@@ -375,35 +373,35 @@ public class DriverService {
 
     }
 
-    public List<MatcherDto2> getAllStartedTrip(String driverEmail) throws EntityNotFoundException {
-        List<MatcherDto2> matcherDto2s = new ArrayList<>();
-        List<Request> requests = requestRepository.getRequestByDriverEmailAndStatus(driverEmail, "accepted");
-        requests.forEach(request -> {
-            User user = this.userRepository.findByEmail(request.getUserEmail()).orElseThrow(() -> new EntityNotFoundException("Could not find entity with id: "));
-            Photo photo = this.photoRepository.findById(request.getUserEmail()).orElseThrow(() -> new EntityNotFoundException("Could not find entity with id: "));
-            MatcherDto2 matcherDto2 = new MatcherDto2();
-            matcherDto2.setUserEmail(request.getUserEmail());
-            matcherDto2.setFirstName(user.getFirstName());
-            matcherDto2.setLastName(user.getLastName());
-            matcherDto2.setImage(photo.getImage());
-            matcherDto2.setPhoneNumber(user.getPhone());
-            matcherDto2.setStatus(request.getStatus());
-            matcherDto2.setLatitudePassengerFrom(request.getLatitudePassengerFrom());
-            matcherDto2.setLongitudePassengerFrom(request.getLongitudePassengerFrom());
-            matcherDto2.setLatitudePassengerTo(request.getLatitudePassengerTo());
-            matcherDto2.setLongitudePassengerTo(request.getLongitudePassengerTo());
-            matcherDto2.setTimeOfPickUp(request.getTimeOfPickUp());
-            matcherDto2.setAmountPaid(request.getAmountPaid());
-            matcherDto2.setDropOffAddress(request.getDropOffAddress());
-            matcherDto2.setPickUpAddress(request.getPickUpAddress());
-            matcherDto2.setDistance(request.getDistance());
-            matcherDto2.setDuration(request.getDuration());
-            matcherDto2.setDropOffTime(request.getDropOffTime());
-            matcherDto2s.add(matcherDto2);
-        });
-
-
-        return matcherDto2s;
-
-    }
+//    public List<MatcherDto2> getAllStartedTrip(String driverEmail) throws EntityNotFoundException {
+//        List<MatcherDto2> matcherDto2s = new ArrayList<>();
+//        List<Request> requests = requestRepository.getRequestByDriverEmailAndStatus(driverEmail, "accepted");
+//        requests.forEach(request -> {
+//            User user = this.userRepository.findByEmail(request.getUserEmail()).orElseThrow(() -> new EntityNotFoundException("Could not find entity with id: "));
+//            Photo photo = this.photoRepository.findById(request.getUserEmail()).orElseThrow(() -> new EntityNotFoundException("Could not find entity with id: "));
+//            MatcherDto2 matcherDto2 = new MatcherDto2();
+//            matcherDto2.setUserEmail(request.getUserEmail());
+//            matcherDto2.setFirstName(user.getFirstName());
+//            matcherDto2.setLastName(user.getLastName());
+//            matcherDto2.setImage(photo.getImage());
+//            matcherDto2.setPhoneNumber(user.getPhone());
+//            matcherDto2.setStatus(request.getStatus());
+//            matcherDto2.setLatitudePassengerFrom(request.getLatitudePassengerFrom());
+//            matcherDto2.setLongitudePassengerFrom(request.getLongitudePassengerFrom());
+//            matcherDto2.setLatitudePassengerTo(request.getLatitudePassengerTo());
+//            matcherDto2.setLongitudePassengerTo(request.getLongitudePassengerTo());
+//            matcherDto2.setTimeOfPickUp(request.getTimeOfPickUp());
+//            matcherDto2.setAmountPaid(request.getAmountPaid());
+//            matcherDto2.setDropOffAddress(request.getDropOffAddress());
+//            matcherDto2.setPickUpAddress(request.getPickUpAddress());
+//            matcherDto2.setDistance(request.getDistance());
+//            matcherDto2.setDuration(request.getDuration());
+//            matcherDto2.setDropOffTime(request.getDropOffTime());
+//            matcherDto2s.add(matcherDto2);
+//        });
+//
+//
+//        return matcherDto2s;
+//
+//    }
 }
